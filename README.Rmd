@@ -1,5 +1,5 @@
 ---
-title: "README"
+title: "Imputing IBD Immuno Chip Genetic Data"
 author: "Translational Genomics Group"
 date: "8/31/2018"
 output: github_document
@@ -9,22 +9,13 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## Organization
+Each workflow step has its own folder and README. Often each workflow step is repeated for each of our identified cohorts. Genetic data and derivatives are not updated to this repository, but are avaialble. 
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## Workflow
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+1. Split genetic data into relevant cohorts [split_cohorts](split_cohorts/)
+2. Estimate ancestry and split cohorts based on ancestry [estimate_ancestry](estimate_ancestry/)
+3. Perform ancestry specific QC [qc](qc/)
+4. Prepare genotype data for Imputation QC [pre_impute_prep](pre_impute_prep/)
+5. Post imputation QC [post_impute_qc](post_impute_qc/)
