@@ -52,6 +52,7 @@ plink \
 --out temp_1
 ```
 
+
 ## 2. Filter Markers for Issues
 Remove SNPs with 
 1. Has a mapping issue
@@ -81,9 +82,66 @@ plink \
 --out temp_2
 ```
 
-## 3. Seperate into the following 3 cohorts
-```{r}
+## 3. Seperate into the 3 cohorts
+I am going to seperate the samples into 3 cohorts. 
+- iChip 1 - 6 
+- iChip 7
+- BBC
 
+This is necessary because if I include all the samples in one batch, the missingness is high for specific SNPs and those SNPs fail pre-imputation QC on the server. 
+
+### A. Create Lists of of Samples Identifying Which Cohort Each Sample Belongs to 
+There are 83 samples that I could not assign batch on. These samples generally have updated genetic ids or are replicated. I assigned all of these samples to the ichip 1 to 6 cohort. 
+```{r}
+fam <- read_table2("../../original_data/IBDichip1to7eBBCTOP_unfilteredHG19b.fam", 
+                   col_names = c("FID", "IID", "WFID_F", "WFID_M", "SEX", "PHENO"))
+
+batches <- read_tsv("../../original_data/batch_tidy_all.tsv", col_types = cols(LABID2 = col_character(),
+                                                                               Run = col_character()))
+
+
+bbc <- batches %>%
+  filter(Run == "BBC") %>%
+  select(LABID2) %>%
+  write_tsv("temp_bbc_samples.tsv", col_names = FALSE)
+
+ichip7 <- batches %>%
+  filter(Run == "Immunochip7") %>%
+  select(LABID2) %>%
+  write_tsv("temp_ichip7_samples.tsv", col_names = FALSE)
+
+fam %>%
+  filter(!FID %in% c(bbc$LABID2, ichip7$LABID2)) %>%
+  select(FID) %>%
+  write_tsv("temp_ichip1t6_samples.tsv", col_names = FALSE)
+
+```
+
+### B. Create ichip1t6 Cohort
+```{bash}
+plink \
+--bfile temp_2 \
+--keep-fam temp_ichip1t6_samples.tsv \
+--make-bed \
+--out cohort_split_ichip1t6
+```
+
+### C. Create ichip7 Cohort
+```{bash}
+plink \
+--bfile temp_2 \
+--keep-fam temp_ichip7_samples.tsv \
+--make-bed \
+--out cohort_split_ichip7
+```
+
+### D. Create BBC Cohort
+```{bash}
+plink \
+--bfile temp_2 \
+--keep-fam temp_bbc_samples.tsv \
+--make-bed \
+--out cohort_split_bbc
 ```
 
 ## Clean Up
