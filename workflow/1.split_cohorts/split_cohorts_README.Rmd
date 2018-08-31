@@ -1,6 +1,6 @@
 ---
-title: "Split Cohorts and Perform Global Operations - README"
-author: "Translational Genomics Group"
+title: "README"
+author: "Split Cohorts and Perform Global Operations"
 date: "8/31/2018"
 output: github_document
 ---
