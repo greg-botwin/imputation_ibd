@@ -1,0 +1,93 @@
+---
+title: "Split Cohorts and Perform Global Operations - Workflow"
+author: "Translational Genomics Group"
+date: "8/31/2018"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## 1. Update Bim Positions
+
+### A. Read in Annotation File and Bim File
+```{r}
+# read anno file
+annotation <- read_tsv("../../original_data/ichip_v2_v1_grch37_no_indels_annovar_annotation_25_jul_2018.tsv", 
+                       col_types = cols(.default = "c"))
+
+# selection only necessary columns and change class
+annotation <- annotation %>%
+  select(Name, IlmnID, Chr, SNP, MapInfo_GRCh37, deCODEcM_GRCh37, RsID_dbsnp138, 
+         For_Rev_Allele1_GRCh37, For_Rev_Allele2_GRCh37, Top_AlleleA, Top_AlleleB,
+         MappingComment, insertion_deleton, platform, Ref_GRCh37, Alt_GRCh37,
+         bim_A1, bim_A2) %>%
+  mutate(Chr = as.integer(Chr), MapInfo_GRCh37 = as.integer(MapInfo_GRCh37))
+
+# read bim
+bim <- read_table2("../../original_data/IBDichip1to7eBBCTOP_unfilteredHG19b.bim",
+                  col_names = c("CHR", "Name", "POS", "BP", "A1", "A2"))
+```
+
+### B. Combine and Write File with Name, New BP
+```{r}
+# combine bim and annotation
+bim_annotated <- left_join(bim, annotation, by = "Name")
+
+# write update map file
+bim_annotated %>%
+  select(Name, MapInfo_GRCh37) %>%
+  mutate(MapInfo_GRCh37 = if_else(is.na(MapInfo_GRCh37), as.integer(0), MapInfo_GRCh37)) %>%
+  write_tsv("temp_update_map.tsv", col_names = FALSE)
+```
+
+### C. Update Map in Plink
+```{bash}
+plink \
+--bfile ../../original_data/IBDichip1to7eBBCTOP_unfilteredHG19b \
+--update-map temp_update_map.tsv 2 1 \
+--make-bed \
+--out temp_1
+```
+
+## 2. Filter Markers for Issues
+Remove SNPs with 
+1. Has a mapping issue
+2. Sex Chromosome
+3. No BP Position (doesn't add anything)
+4. Insertion/Deletion
+
+### A. Create List of Passing SNPs
+```{r}
+bim_annotated %>%
+  filter(MappingComment == "None" | 
+           MappingComment == "updated map position differs from position in ichip1to7top_unfiltered_e_bim" |
+           MappingComment == "Previously mapped to Chr 5, but probe correctly matched to Chr 15.") %>%
+  filter(CHR %in% c(1:22)) %>%
+  filter(!is.na(MapInfo_GRCh37)) %>%
+  filter(insertion_deleton == FALSE) %>%
+  select(Name) %>%
+  write_tsv("temp_passing_markers.tsv", col_names = FALSE)
+```
+
+### B. Filter Genotype Data
+```{bash}
+plink \
+--bfile temp_1 \
+--extract temp_passing_markers.tsv \
+--make-bed \
+--out temp_2
+```
+
+## 3. Seperate into the following 3 cohorts
+```{r}
+
+```
+
+## Clean Up
+```{r}
+file.remove(list.files(pattern = "temp", full.names = TRUE))
+```
+

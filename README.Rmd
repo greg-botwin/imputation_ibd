@@ -12,10 +12,15 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Organization
 Each workflow step has its own folder and README. Often each workflow step is repeated for each of our identified cohorts. Genetic data and derivatives are not updated to this repository, but are avaialble. 
 
+## Original Data
+1. Genotype data from IBDichip1to7eBBCTOP_unfilteredHG19b.* 
+2. Updated annotation file 25_jul_2018
+3. 
+
 ## Workflow
 
-1. Split genetic data into relevant cohorts [split_cohorts](split_cohorts/)
-2. Estimate ancestry and split cohorts based on ancestry [estimate_ancestry](estimate_ancestry/)
-3. Perform ancestry specific QC [qc](qc/)
-4. Prepare genotype data for Imputation QC [pre_impute_prep](pre_impute_prep/)
-5. Post imputation QC [post_impute_qc](post_impute_qc/)
+1. Split genetic data into relevant cohorts [split_cohorts](1.split_cohorts/)
+2. Estimate ancestry and split cohorts based on ancestry [estimate_ancestry](2.estimate_ancestry/)
+3. Perform ancestry specific QC [qc](3.qc/)
+4. Prepare genotype data for Imputation QC [pre_impute_prep](4.pre_impute_prep/)
+5. Post imputation QC [post_impute_qc](5.post_impute_qc/)
