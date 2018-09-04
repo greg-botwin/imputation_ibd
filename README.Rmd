@@ -15,7 +15,7 @@ Each workflow step has its own folder and README. Often each workflow step is re
 ## Original Data
 1. Genotype data from IBDichip1to7eBBCTOP_unfilteredHG19b.* 
 2. Updated annotation file 25_jul_2018
-3. 
+3. List of batches each sample was run under for cohort splits (e.g. ichip 1 vs 7, from PCA_Investigation Project)
 
 ## Workflow
 
