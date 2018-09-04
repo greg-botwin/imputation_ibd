@@ -18,7 +18,7 @@ library(tidyverse)
 annotation <- read_tsv("../../original_data/ichip_v2_v1_grch37_no_indels_annovar_annotation_25_jul_2018.tsv", 
                        col_types = cols(.default = "c"))
 
-# selection only necessary columns and change class
+# select only necessary columns and change class
 annotation <- annotation %>%
   select(Name, IlmnID, Chr, SNP, MapInfo_GRCh37, deCODEcM_GRCh37, RsID_dbsnp138, 
          For_Rev_Allele1_GRCh37, For_Rev_Allele2_GRCh37, Top_AlleleA, Top_AlleleB,

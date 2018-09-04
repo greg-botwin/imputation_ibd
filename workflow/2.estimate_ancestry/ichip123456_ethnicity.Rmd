@@ -1,0 +1,440 @@
+---
+title: "Estimating Ethnicity in the iChip 1-6 Dataset"
+author: "Translational Genomics Group"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(knitr)
+library(ggplot2)
+library(cluster)
+library(tibble)
+```
+
+## Goals
+
+The principle goal of this notebook is to provide an ancestry estimate for each subject in the iChip1t6 dataset dataset that can later be used for sub-setting to more homogenous populations. 
+
+Ancestry estimation will be performed using the ADMIXTURE tool. Allele frequencies will first be learned in a supervised manner from labeled data provided by 1000 Genomes samples belonging to the EUR, AFR and EAS populations. Then ancestry proportions will then be estimated for the iChip 1 -6 samples. 
+
+## 1. Preapre iChip 1 to 6 Dataset
+
+### A. Download Immuno_BeadChip_11419691_B Strand Files for iChip 1 to 6
+```{bash eval = FALSE, message = FALSE}
+wget http://www.well.ox.ac.uk/~wrayner/strand/Immuno_BeadChip_11419691_B-b37-strand.zip -O temp.zip; unzip temp.zip; rm temp.zip &>/dev/null
+```
+
+### B. Create List of SNPs to Flip
+```{r}
+strand <- read_tsv("immuno_beadchip_11419691_b-b37.strand", 
+                   col_names = c("SNP", "Chr", "BP", "Match", "Strand", "Allele"))
+
+strand %>%
+  filter(Strand == "-") %>%
+  select(SNP) %>%
+  write_tsv("temp_flip_ichip1t6.tsv", col_names = FALSE)
+```
+
+### C. Convert TOP to Forward/Ref in Plink
+```{bash}
+plink \
+--bfile ../1.split_cohorts/cohort_split_ichip1t6 \
+--flip temp_flip_ichip1t6.tsv \
+--make-bed \
+--out ≈≈≈
+```
+
+### D. Download 1000G Check Tool 
+```{bash eval = FALSE}
+wget http://www.well.ox.ac.uk/~wrayner/tools/HRC-1000G-check-bim-v4.2.9.zip -O temp.zip; unzip temp.zip; rm temp.zip
+```
+
+### E. Download 1000 Genome Reference
+This is a large file ~10GB and needs to be unzipped. A local copy has already been downloaded to: 
+/mnt/share6/SHARED_DATASETS/1000_genomes/reference_file/1000GP_Phase3_combined.legend
+
+```{bash, eval = FALSE}
+wget http://www.well.ox.ac.uk/~wrayner/tools/1000GP_Phase3_combined.legend.gz ; gunzip -k 1000GP_Phase3_combined.legend.gz; rm 1000GP_Phase3_combined.legend.gz
+```
+
+### F. Compute Allele Frequencies to Check for Divergence against 1000 Genome Reference Population
+```{bash}
+plink \
+--bfile temp_ichip1t6 \
+--geno 0.03 \
+--maf 0.01 \
+--hwe 0.000001 \
+--freq \
+--make-bed \
+--out temp2_ichip1t6
+```
+
+### Run 1000G Checks
+This takes ~30 minutes. 
+```{bash eval = FALSE}
+perl HRC-1000G-check-bim.pl \
+-b temp2_ichip1t6.bim \
+-f temp2_ichip1t6.frq \
+-r /mnt/share6/SHARED_DATASETS/1000_genomes/reference_file/1000GP_Phase3_combined.legend \
+-g
+```
+
+### Perform Recommended PLINK commands to clean Share and Output snplist
+#### Exlude SNPs
+```{bash}
+plink \
+--bfile IBDichip123456BBCTOP_unfilteredE3_HG19_common_snps_no_bbc_ethnic_clean \
+--exclude Exclude-IBDichip123456BBCTOP_unfilteredE3_HG19_common_snps_no_bbc_ethnic_clean-1000G.txt \
+--make-bed \
+--out TEMP1
+```
+
+#### Update Chromosome Positions
+```{bash}
+plink \
+--bfile TEMP1 \
+--update-chr Chromosome-IBDichip123456BBCTOP_unfilteredE3_HG19_common_snps_no_bbc_ethnic_clean-1000G.txt \
+--make-bed \
+--out TEMP2
+```
+
+#### Update Positions
+```{bash}
+plink \
+--bfile TEMP2 \
+--update-map Position-IBDichip123456BBCTOP_unfilteredE3_HG19_common_snps_no_bbc_ethnic_clean-1000G.txt \
+--make-bed \
+--out TEMP3
+
+```
+
+#### Flip Strands
+```{bash}
+plink \
+--bfile TEMP3 \
+--flip Strand-Flip-IBDichip123456BBCTOP_unfilteredE3_HG19_common_snps_no_bbc_ethnic_clean-1000G.txt \
+--make-bed \
+--out TEMP4
+
+```
+
+#### Set Ref Allele
+From this point forward is necessary to preserve allele assignemnt 
+```{bash}
+plink \
+--bfile TEMP4 \
+--reference-allele Force-Allele1-IBDichip123456BBCTOP_unfilteredE3_HG19_common_snps_no_bbc_ethnic_clean-1000G.txt \
+--make-bed \
+--out TEMP5
+
+```
+
+#### Update Names and Write SNP List (Plink2)
+
+```{bash}
+plink2 \
+--bfile TEMP5 \
+--make-bed \
+--keep-allele-order \
+--new-id-max-allele-len 23 truncate \
+--set-all-var-ids @:#[hg19] \
+--write-snplist \
+--out IBDichip123456BBCTOP_unfilteredE3_HG19_common_snps_no_bbc_ethnic_clean-updated
+```
+
+## Process 1000 Genomes Data 
+### Download Raw Data for Chr 1 - 22
+```{bash eval = FALSE}
+for i in {1..22}; do
+       wget ftp://ftp-trace.ncbi.nih.gov/1000genomes/ftp/release/20130502/ALL.chr${i}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz
+done
+```
+
+### Get list of CHR and Position from Share Marker names to be used to extract subset of 1000 Genome
+```{r message=FALSE}
+ichip_snplist <- read_table2("IBDichip123456BBCTOP_unfilteredE3_HG19_common_snps_no_bbc_ethnic_clean-updated.snplist", col_names = "SNP")
+
+ichip_snplist %>%
+  separate(SNP, into = c("CHR", "BP"), sep = ":") %>%
+  separate(BP, into = c("BP", "genome"), sep = "\\[") %>%
+  filter(CHR %in% c(1:22)) %>%
+  filter(BP != 0) %>%
+  select(CHR, BP) %>%
+  write_tsv("ichip_site_list.txt", col_names = FALSE)
+```
+
+### Extract Markers from 1000Genome with Chrom and Position that Match Share iCHIP
+```{bash eval = FALSE}
+for i in {1..22}; do
+      vcftools --gzvcf /mnt/share6/SHARED_DATASETS/1000_genomes/ALL.chr${i}.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz \
+               --positions ichip_site_list.txt \
+               --recode \
+               --recode-INFO-all \
+               --out ichip_sites/chr${i}.1000g.ichip_sites &
+done
+```
+
+### Concatenate chromosome VCFs into one VCF
+```{bash eval = FALSE}
+bcftools concat -f original_data/ordered_file_names.txt -o ichip_sites/chrall_1000g_ichip_sites.vcf 
+```
+
+### Get List of 1000 Genome Samples Filtered for EUR, AFR, EAS superpopulation samples 
+```{r message=FALSE}
+onek_samples <- read_tsv("original_data/igsr_samples.tsv")
+colnames(onek_samples) <- make.names(colnames(onek_samples))
+
+onek_samples %>%
+  filter(Superpopulation.code %in% c("EUR", "AFR", "EAS")) %>%
+  mutate(FID = 0) %>%
+  select(FID, Sample.name) %>% 
+  write_tsv("onek_samples_3_pops.tsv", col_names = FALSE)
+```
+
+### Read Combined Chromosomes 1000 Genomes Samples with only Share Markers into PLINK and Set Names and Exclude not 3 Population Samples
+```{bash}
+plink2 \
+--vcf ichip_sites/chrall_1000g_ichip_sites.vcf \
+--set-all-var-ids @:#[hg19] \
+--new-id-max-allele-len 23 'truncate' \
+--keep onek_samples_3_pops.tsv \
+--make-bed \
+--out chrall_1000g_ichip_sites_set_names &>/dev/null
+```
+
+## Merge iCHIP and 1000 Genomes
+### Prior to Merge Remove Identify Non Bi-allelic SNPs 
+```{bash eval = FALSE}
+plink \
+--bfile IBDichip123456BBCTOP_unfilteredE3_HG19_common_snps_no_bbc_ethnic_clean-updated \
+--bmerge chrall_1000g_ichip_sites_set_names \
+--merge-mode 6 \
+--keep-allele-order \
+--out ichip123456_1000g_ichip_sites_merged
+```
+
+### Remove Non Bi-allelic SNPs iCHIP
+```{bash}
+plink \
+--bfile IBDichip123456BBCTOP_unfilteredE3_HG19_common_snps_no_bbc_ethnic_clean-updated \
+--exclude ichip123456_1000g_ichip_sites_merged.missnp \
+--make-bed \
+--keep-allele-order \
+--out IBDichip123456BBCTOP_unfilteredE3_HG19_common_snps_no_bbc_ethnic_clean-updated_remove_tri
+```
+
+### Remove Non Bi-allelic SNPs 1000 Genome
+```{bash}
+plink \
+--bfile chrall_1000g_ichip_sites_set_names \
+--exclude ichip123456_1000g_ichip_sites_merged.missnp \
+--make-bed \
+--keep-allele-order \
+--out chrall_1000g_ichip_sites_set_names_remove_tri
+```
+
+### Merge 
+```{bash}
+plink \
+--bfile IBDichip123456BBCTOP_unfilteredE3_HG19_common_snps_no_bbc_ethnic_clean-updated_remove_tri \
+--bmerge chrall_1000g_ichip_sites_set_names_remove_tri \
+--keep-allele-order \
+--out ichip_1000g_ichip_sites_remove_tri_merged
+```
+
+## Prune Combined dataset
+```{bash}
+plink \
+--bfile ichip_1000g_ichip_sites_remove_tri_merged \
+--exclude range original_data/highLDregions.txt \
+--indep 50 5 1.8 \
+--geno .03 \
+--maf .01 \
+--keep-allele-order \
+--out ichip_1000g_ichip_sites_remove_tri_merged &>/dev/null
+```
+
+#### Extarct Pruned SNP in Merged Dataset
+```{bash}
+plink \
+--bfile ichip_1000g_ichip_sites_remove_tri_merged \
+--extract ichip_1000g_ichip_sites_remove_tri_merged.prune.in \
+--keep-allele-order \
+--make-bed \
+--out ichip_1000g_ichip_sites_remove_tri_merged_pruned &>/dev/null
+```
+
+## Estimate Ancestry Using ADMIXTURE Supervised Learning with 4 1000 Genome Reference Populations
+### Create .pop File for Identifying 1000 Genome Reference Samples
+```{r warning=FALSE, message=FALSE}
+merged_fam <- read_table2("ichip_1000g_ichip_sites_remove_tri_merged_pruned.fam", col_names = c("FAM", "IID", "ID_F", "ID_M", "SEX", "PHENOTYPE"), col_types = 
+                            list(FAM = col_character(),
+                                  IID = col_character(),
+                                  ID_F = col_integer(),
+                                  ID_M = col_integer(),
+                                  SEX = col_integer(),
+                                  PHENOTYPE = col_integer()))
+
+merged_fam <- merged_fam %>%
+  mutate(FAM = ifelse(FAM == "0", IID, FAM))
+
+merged_pop_file <- left_join(merged_fam, onek_samples, by = c("FAM" = "Sample.name")) 
+
+merged_pop_file <- merged_pop_file %>%
+  select(FAM, Superpopulation.code) %>%
+  mutate(Superpopulation.code = if_else(is.na(Superpopulation.code), "-", Superpopulation.code))
+
+merged_pop_file %>%
+  select(Superpopulation.code) %>%
+  write_tsv("ichip_1000g_ichip_sites_remove_tri_merged_pruned.pop", col_names = FALSE)
+```
+
+### Run ADMIXTURE Supervised
+This takes > 1 hour using 48 cores
+```{bash eval = FALSE}
+admixture ichip_1000g_ichip_sites_remove_tri_merged_pruned.bed 3 -j48 --supervised 
+```
+
+```{bash, eval = FALSE}
+cp ichip_1000g_ichip_sites_remove_tri_merged_pruned.3.* original_data/
+```
+
+### Assign Clusters by KMeans, PAM, and >75%
+```{r message=FALSE, warning=FALSE}
+merged_admix <- read_table2("original_data/ichip_1000g_ichip_sites_remove_tri_merged_pruned.3.Q", col_names = FALSE) 
+set.seed(1234)
+kmeans_out_merged <- kmeans(merged_admix, centers = 4, nstart = 100)
+set.seed(1234)
+pam_out <- pam(merged_admix, k = 4)
+
+merged_admix_pop <- bind_cols(merged_admix, merged_pop_file)
+merged_admix_pop <- merged_admix_pop %>%
+  rename(EUR = X1, EAS = X2, AFR = X3) %>%
+  mutate(kmeans_cluster = kmeans_out_merged$cluster) %>%
+  mutate(cedars_75_class = if_else(EUR >= 0.75, "EUR",
+                                    if_else(EAS >= 0.75, "EAS",
+                                                    if_else(AFR >= 0.75, "AFR", "Mixed")))) %>%
+  mutate(kmeans_class = if_else(kmeans_cluster == 1, "AFR",
+                                if_else(kmeans_cluster == 2, "Mixed",
+                                        if_else(kmeans_cluster == 3, "EAS",
+                                                if_else(kmeans_cluster == 4, "EUR", "wilson"))))) %>%
+  mutate(pam_cluster = pam_out$clustering) %>%
+  mutate(pam_class = if_else(pam_cluster == 1, "EUR",
+                                if_else(pam_cluster == 2, "EAS", 
+                                                if_else(pam_cluster == 3, "AFR",
+                                                        if_else(pam_cluster == 4, "Mixed", "wilson")))))
+
+merged_admix_pop %>%
+  filter(Superpopulation.code == "-") %>%
+  group_by(cedars_75_class) %>%
+  summarise(n = n()) %>%
+  kable()
+  
+merged_admix_pop %>%
+  filter(Superpopulation.code == "-") %>%
+  group_by(kmeans_class) %>%
+  summarise(n = n()) %>%
+  kable()
+
+merged_admix_pop %>%
+  filter(Superpopulation.code == "-") %>%
+  group_by(pam_class) %>%
+  summarise(n = n()) %>%
+  kable()
+
+merged_admix_pop %>%
+  filter(Superpopulation.code == "-") %>%
+  arrange(desc(EUR), desc(AFR), desc(EAS)) %>%
+  rownames_to_column() %>%
+  mutate(rowname = as.integer(rowname)) %>%
+  select(FAM, EUR, AFR, EAS, rowname) %>%
+  gather(key = "ancestry", value = "proportion", -FAM, -rowname) %>%
+  ggplot(aes(x = reorder(FAM, rowname), y = proportion, fill = ancestry)) + 
+  geom_bar(stat = "identity") +
+  scale_y_continuous(limits = c(NA, 1.05)) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  labs(y = "Estimated Proportion", x = "Sample", title = "Estimated Ancestry Proportion of iChip1-6 Samples by Supervised Admixture") + scale_fill_discrete(name="Population")
+  
+  
+  
+```
+
+
+### Perform PCA
+```{bash}
+plink \
+--bfile ichip_1000g_ichip_sites_remove_tri_merged_pruned \
+--pca header tabs \
+--out ichip_1000g_ichip_sites_remove_tri_merged_pruned &>/dev/null
+```
+
+### Plot PCAs
+```{r message=FALSE, warning=FALSE}
+merged_pca <- read_table2("ichip_1000g_ichip_sites_remove_tri_merged_pruned.eigenvec") 
+
+merged_pca <- merged_pca %>%
+  mutate(FID = ifelse(FID == 0, IID, FID))
+
+merged_admix_pop_pca <- left_join(merged_admix_pop, merged_pca, by = c("FAM" = "FID"))
+merged_admix_pop_pca <- merged_admix_pop_pca %>% 
+  distinct(FID, .keep_all = TRUE)
+
+merged_admix_pop_pca %>%
+  filter(Superpopulation.code != "-") %>%
+  ggplot(aes(x = PC1, y = PC2, color = as.factor(Superpopulation.code))) +
+  geom_point() +
+  labs(title = "PCA of 1000 Genome Samples (merged with iChip1-6) Colored by \n reported Super-Population") +
+  theme(legend.title=element_blank())
+
+merged_admix_pop_pca %>%
+  ggplot(aes(x = PC1, y = PC2, color = as.factor(Superpopulation.code))) +
+  geom_point() +
+  labs(title = "PCA of 1000 Genome and iChip1-6 Samples Colored by \n Reported Super-Population") +
+  theme(legend.title=element_blank())
+
+merged_admix_pop_pca %>%
+  filter(Superpopulation.code == "-") %>%
+  ggplot(aes(x = PC1, y = PC2, color = as.factor(kmeans_class))) +
+  geom_point() +
+  labs(title = "PCA of iChip1-6 Samples Colored by KMeans") +
+  theme(legend.title=element_blank())
+
+merged_admix_pop_pca %>%
+  filter(Superpopulation.code == "-") %>%
+  ggplot(aes(x = PC1, y = PC2, color = as.factor(pam_class))) +
+  geom_point() +
+  labs(title = "PCA of iChip1-6 Samples Colored by PAM") +
+  theme(legend.title=element_blank())
+
+merged_admix_pop_pca %>%
+  filter(Superpopulation.code == "-") %>%
+  ggplot(aes(x = PC1, y = PC2, color = as.factor(cedars_75_class))) +
+  geom_point() +
+  labs(title = "PCA of iChip1-6 Samples Colored by 75%") +
+  theme(legend.title=element_blank())
+
+merged_admix_pop_pca %>%
+  filter(Superpopulation.code == "-") %>%
+  ggplot(aes(x = PC1, y = PC2)) +
+  geom_point() +
+  labs(title = "PCA of iChip1-6 Samples") +
+  theme(legend.title=element_blank())
+
+```
+
+### Write Assigned 
+```{r}
+merged_admix_pop_pca %>% 
+  filter(!FAM %in% onek_samples$Sample.name) %>%
+  filter(cedars_75_class == "EUR") %>%
+  select(FAM) %>%
+  write_tsv(path = "original_data/ichip123456_eur_samples.tsv", col_names = FALSE)
+  
+```
+
