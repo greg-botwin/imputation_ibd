@@ -146,6 +146,6 @@ plink \
 
 ## Clean Up
 ```{r}
-file.remove(list.files(pattern = "temp", full.names = TRUE))
+file.remove(list.files(pattern = "^temp", full.names = TRUE))
 ```
 

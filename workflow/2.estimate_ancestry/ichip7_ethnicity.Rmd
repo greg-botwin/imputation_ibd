@@ -1,5 +1,5 @@
 ---
-title: "Estimating Ethnicity in the iChip 1-6 Dataset"
+title: "Estimating Ethnicity in the iChip 7 Dataset"
 author: "Translational Genomics Group"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: github_document
@@ -16,48 +16,43 @@ library(cluster)
 library(tibble)
 ```
 
-## Goals
+## 2. Preapre iChip 7 Dataset
 
-The principle goal of this notebook is to provide an ancestry estimate for each subject in the iChip1t6 dataset dataset that can later be used for sub-setting to more homogenous populations. 
-
-Ancestry estimation will be performed using the ADMIXTURE tool. Allele frequencies will first be learned in a supervised manner from labeled data provided by 1000 Genomes samples belonging to the EUR, AFR and EAS populations. Then ancestry proportions will then be estimated for the iChip 1 -6 samples. 
-
-## 1. Preapre iChip 1 to 6 Dataset
-
-### A. Download Immuno_BeadChip_11419691_B Strand Files for iChip 1 to 6 and Ref/Alt File
+### A. Download InfiniumImmunoArray-24v2-0_A-b37Strand Files for iChip 7 and Ref/Alt File
 ```{bash eval = FALSE, message = FALSE}
-wget http://www.well.ox.ac.uk/~wrayner/strand/Immuno_BeadChip_11419691_B-b37-strand.zip -O temp.zip; unzip temp.zip; rm temp.zip &>/dev/null
+wget http://www.well.ox.ac.uk/~wrayner/strand/InfiniumImmunoArray-24v2-0_A-b37-strand.zip -O temp.zip; unzip temp.zip; rm temp.zip &>/dev/null
 
-wget http://www.well.ox.ac.uk/~wrayner/strand/RefAlt/Immuno_BeadChip_11419691_B-b37.strand.RefAlt.zip -O temp.zip; unzip temp.zip; rm temp.zip &>/dev/null
+wget http://www.well.ox.ac.uk/~wrayner/strand/RefAlt/InfiniumImmunoArray-24v2-0_A-b37.strand.RefAlt.zip -O temp.zip; unzip temp.zip; rm temp.zip &>/dev/null
 ```
 
 ### B. Create List of SNPs to Flip
 ```{r}
-strand <- read_tsv("immuno_beadchip_11419691_b-b37.strand", 
+strand <- read_tsv("InfiniumImmunoArray-24v2-0_A-b37.strand", 
                    col_names = c("SNP", "Chr", "BP", "Match", "Strand", "Allele"))
 
 strand %>%
   filter(Strand == "-") %>%
   select(SNP) %>%
-  write_tsv("temp_flip_ichip1t6.tsv", col_names = FALSE)
+  write_tsv("temp_flip_ichip7.tsv", col_names = FALSE)
+
 ```
 
 ### C. Flip SNPs to Convert TOP to Forward/Ref in Plink
 ```{bash}
 plink \
---bfile ../1.split_cohorts/cohort_split_ichip1t6 \
---flip temp_flip_ichip1t6.tsv \
+--bfile ../1.split_cohorts/cohort_split_ichip7 \
+--flip temp_flip_ichip7.tsv \
 --make-bed \
---out temp_ichip1t6
+--out temp_ichip7
 ```
 
 ### D. Set Ref/Alt Allele 
 ```{bash}
 plink \
---bfile temp_ichip1t6 \
---reference-allele Immuno_BeadChip_11419691_B-b37.strand.RefAlt 2 \
+--bfile temp_ichip7 \
+--reference-allele InfiniumImmunoArray-24v2-0_A.b37.RefAlt 2 \
 --make-bed \
---out temp2_ichip1t6
+--out temp2_ichip7
 ```
 
 ### D. Download 1000G Check Tool 
@@ -76,30 +71,30 @@ wget http://www.well.ox.ac.uk/~wrayner/tools/1000GP_Phase3_combined.legend.gz ; 
 ### F. Filter to high quality SNPs For Ancestry Estimation
 ```{bash}
 plink \
---bfile temp2_ichip1t6 \
+--bfile temp2_ichip7 \
 --geno 0.03 \
 --maf 0.01 \
 --hwe 0.000001 \
 --keep-allele-order \
 --make-bed \
---out temp3_ichip1t6
+--out temp3_ichip7
 ```
 
 ### Calcualte Allele Frequency
 ```{bash}
 plink \
---bfile temp3_ichip1t6 \
+--bfile temp3_ichip7 \
 --keep-allele-order \
 --freq \
---out temp3_ichip1t6
+--out temp3_ichip7
 ```
 
 ### Run 1000G Checks
 This takes ~30 minutes. 
 ```{bash eval = FALSE}
 perl HRC-1000G-check-bim.pl \
--b temp3_ichip1t6.bim \
--f temp3_ichip1t6.frq \
+-b temp3_ichip7.bim \
+-f temp3_ichip7.frq \
 -r /mnt/share6/SHARED_DATASETS/1000_genomes/reference_file/1000GP_Phase3_combined.legend \
 -g
 ```
@@ -107,12 +102,12 @@ perl HRC-1000G-check-bim.pl \
 #### Exlude SNPs 
 ```{bash}
 plink2 \
---bfile temp3_ichip1t6 \
---exclude Exclude-temp3_ichip1t6-1000G.txt \
+--bfile temp3_ichip7 \
+--exclude Exclude-temp3_ichip7-1000G.txt \
 --set-all-var-ids @:#[hg19] \
 --keep-allele-order \
 --make-bed \
---out temp4_ichip1t6
+--out temp4_ichip7
 ```
 
 ## Process 1000 Genomes Data 
@@ -125,7 +120,7 @@ done
 
 ### Get list of CHR and Position from Marker names to be used to extract subset of 1000 Genome
 ```{r message=FALSE}
-snplist <- read_table2("temp4_ichip1t6.bim", col_names = c("Chr", "SNP", "Pos", "BP", "A1", "A2"))
+snplist <- read_table2("temp4_ichip7.bim", col_names = c("Chr", "SNP", "Pos", "BP", "A1", "A2"))
 
 snplist %>%
   select(Chr, BP) %>%
@@ -139,13 +134,13 @@ for i in {1..22}; do
                --positions temp_site_list.txt \
                --recode \
                --recode-INFO-all \
-               --out ichip1t6_1000G_markers/chr${i}.1000g.ichip_sites &
+               --out ichip7_1000G_markers/chr${i}.1000g.ichip_sites &
 done
 ```
 
 ### Concatenate chromosome VCFs into one VCF
 ```{bash eval = FALSE}
-bcftools concat -f ../../original_data/ordered_filenames.txt -o ichip1t6_1000G_markers/chrall_1000g_ichip_sites.vcf
+bcftools concat -f ../../original_data/ordered_filenames_ichip7.txt -o ichip7_1000G_markers/chrall_1000g_ichip_sites.vcf
 ```
 
 ### Get List of 1000 Genome Samples Filtered for EUR, AFR, EAS superpopulation samples 
@@ -163,7 +158,7 @@ onek_samples %>%
 ### Read Combined Chromosomes 1000 Genomes Samples with only Share Markers into PLINK and Set Names and Exclude not 3 Population Samples
 ```{bash}
 plink2 \
---vcf ichip1t6_1000G_markers/chrall_1000g_ichip_sites.vcf \
+--vcf ichip7_1000G_markers/chrall_1000g_ichip_sites.vcf \
 --set-all-var-ids @:#[hg19] \
 --new-id-max-allele-len 23 'truncate' \
 --keep temp_onek_samples_3_pops.tsv \
@@ -174,28 +169,28 @@ plink2 \
 ## Merge iCHIP and 1000 Genomes
 ```{bash eval = FALSE}
 plink \
---bfile temp4_ichip1t6 \
+--bfile temp4_ichip7 \
 --bmerge temp_chrall_1000g_ichip_sites \
 --merge-mode 6 \
 --keep-allele-order \
---out ichip1t6_1000g_ichip_sites_merged
+--out ichip7_1000g_ichip_sites_merged
 ```
 
 ### Remove Non Bi-allelic SNPs iCHIP
 ```{bash}
 plink \
---bfile temp4_ichip1t6 \
---exclude ichip1t6_1000g_ichip_sites_merged.missnp \
+--bfile temp4_ichip7 \
+--exclude ichip7_1000g_ichip_sites_merged.missnp \
 --make-bed \
 --keep-allele-order \
---out temp5_ichip1t6
+--out temp5_ichip7
 ```
 
 ### Remove Non Bi-allelic SNPs 1000 Genome
 ```{bash}
 plink \
 --bfile temp_chrall_1000g_ichip_sites \
---exclude ichip1t6_1000g_ichip_sites_merged.missnp \
+--exclude ichip7_1000g_ichip_sites_merged.missnp \
 --make-bed \
 --keep-allele-order \
 --out temp1_chrall_1000g_ichip_sites
@@ -204,7 +199,7 @@ plink \
 ### Merge 
 ```{bash}
 plink \
---bfile temp5_ichip1t6 \
+--bfile temp5_ichip7 \
 --bmerge temp1_chrall_1000g_ichip_sites \
 --keep-allele-order \
 --out temp_ichip_1000g_sites_merged
@@ -264,13 +259,13 @@ admixture temp1_ichip_1000g_sites_merged.bed 3 -j48 --supervised
 ```
 
 ```{bash, eval = FALSE}
-cp temp1_ichip_1000g_sites_merged.3.Q admix_ichip1t6_merged.3.Q
-cp temp1_ichip_1000g_sites_merged.3.P admix_ichip1t6_merged.3.P
+cp temp1_ichip_1000g_sites_merged.3.Q admix_ichip7_merged.3.Q
+cp temp1_ichip_1000g_sites_merged.3.P admix_ichip7_merged.3.P
 ```
 
 ### Assign Clusters by KMeans, PAM, and >75%
 ```{r message=FALSE, warning=FALSE}
-merged_admix <- read_table2("admix_ichip1t6_merged.3.Q", col_names = FALSE) 
+merged_admix <- read_table2("admix_ichip7_merged.3.Q", col_names = FALSE) 
 set.seed(1234)
 kmeans_out_merged <- kmeans(merged_admix, centers = 4, nstart = 100)
 
@@ -282,9 +277,9 @@ merged_admix_pop <- merged_admix_pop %>%
                                     if_else(EAS >= 0.75, "EAS",
                                                     if_else(AFR >= 0.75, "AFR", "Mixed")))) %>%
   mutate(kmeans_class = if_else(kmeans_cluster == 1, "Mixed",
-                                if_else(kmeans_cluster == 2, "AFR",
-                                        if_else(kmeans_cluster == 3, "EUR",
-                                                if_else(kmeans_cluster == 4, "EAS", "wilson")))))
+                                if_else(kmeans_cluster == 2, "EAS",
+                                        if_else(kmeans_cluster == 3, "AFR",
+                                                if_else(kmeans_cluster == 4, "EUR", "wilson")))))
 
 merged_admix_pop %>%
   filter(Superpopulation.code == "-") %>%
@@ -371,17 +366,17 @@ merged_admix_pop_pca %>%
   filter(!FAM %in% onek_samples$Sample.name) %>%
   filter(cedars_75_class == "EUR") %>%
   select(FAM, IID) %>%
-  write_tsv(path = "ichip1t6_eur_samples.tsv", col_names = FALSE)
+  write_tsv(path = "ichip7_eur_samples.tsv", col_names = FALSE)
   
 ```
 
 ### Split Cohort by Ethnicity
 ```{bash}
 plink \
---bfile ../1.split_cohorts/cohort_split_ichip1t6 \
---keep ichip1t6_eur_samples.tsv \
+--bfile ../1.split_cohorts/cohort_split_ichip7 \
+--keep ichip7_eur_samples.tsv \
 --make-bed \
---out eur_cohort_split_ichip1t6
+--out eur_cohort_split_ichip7
 ```
 
 ## Clean Up
