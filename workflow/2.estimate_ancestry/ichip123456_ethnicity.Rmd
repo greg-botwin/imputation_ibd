@@ -5,7 +5,7 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: github_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, message = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(readr)
 library(dplyr)
@@ -168,7 +168,7 @@ plink2 \
 --new-id-max-allele-len 23 'truncate' \
 --keep temp_onek_samples_3_pops.tsv \
 --make-bed \
---out temp_chrall_1000g_ichip_sites
+--out temp_chrall_1000g_ichip_sites > /dev/null
 ```
 
 ## Merge iCHIP and 1000 Genomes
@@ -219,7 +219,7 @@ plink \
 --geno .03 \
 --maf .01 \
 --keep-allele-order \
---out temp_ichip_1000g_sites_merged
+--out temp_ichip_1000g_sites_merged > /dev/null
 ```
 
 #### Extarct Pruned SNP in Merged Dataset
@@ -322,7 +322,7 @@ merged_admix_pop %>%
 plink \
 --bfile temp1_ichip_1000g_sites_merged \
 --pca header tabs \
---out temp1_ichip_1000g_sites_merged
+--out temp1_ichip_1000g_sites_merged > /dev/null
 ```
 
 ### Plot PCAs
