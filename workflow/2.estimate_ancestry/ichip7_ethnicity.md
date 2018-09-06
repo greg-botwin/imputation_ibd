@@ -221,7 +221,7 @@ plink2 \
     ##   --out temp4_ichip7
     ##   --set-all-var-ids @:#[hg19]
     ## 
-    ## Start time: Wed Sep  5 07:54:43 2018
+    ## Start time: Wed Sep  5 09:43:42 2018
     ## Note: --keep-allele-order no longer has any effect.
     ## 128908 MiB RAM detected; reserving 64454 MiB for main workspace.
     ## Using up to 48 threads (change this with --threads).
@@ -234,7 +234,7 @@ plink2 \
     ## Writing temp4_ichip7.bed ... 0%31%62%93%done.
     ## Writing temp4_ichip7.bim ... done.
     ## Writing temp4_ichip7.fam ... done.
-    ## End time: Wed Sep  5 07:54:43 2018
+    ## End time: Wed Sep  5 09:43:42 2018
 
 Process 1000 Genomes Data
 -------------------------
@@ -585,14 +585,14 @@ plink \
 ### Plot PCAs
 
 ``` r
-merged_pca <- read_table2("temp1_ichip_1000g_sites_merged.eigenvec") 
+merged_pca <- read_table2("temp1_ichip_1000g_sites_merged.eigenvec", col_types = cols(.default = "c")) 
 
 merged_pca <- merged_pca %>%
-  mutate(FID = ifelse(FID == 0, IID, FID))
+  mutate(FID = ifelse(FID == "0", IID, FID)) %>%
+  mutate(PC1 = as.double(PC1)) %>%
+  mutate(PC2 = as.double(PC2))
 
 merged_admix_pop_pca <- left_join(merged_admix_pop, merged_pca, by = c("FAM" = "FID", "IID" = "IID"))
-merged_admix_pop_pca <- merged_admix_pop_pca %>% 
-  distinct(FID, .keep_all = TRUE)
 
 merged_admix_pop_pca %>%
   filter(Superpopulation.code != "-") %>%

@@ -244,7 +244,7 @@ merged_fam <- read_table2("temp1_ichip_1000g_sites_merged.fam", col_names = c("F
                                   PHENOTYPE = col_integer()))
 
 merged_fam <- merged_fam %>%
-  mutate(FAM = ifelse(FAM == "0", IID, FAM))
+  mutate(FAM = if_else(FAM == "0", IID, FAM))
 
 merged_pop_file <- left_join(merged_fam, onek_samples, by = c("FAM" = "Sample.name")) 
 
@@ -326,15 +326,15 @@ plink \
 ```
 
 ### Plot PCAs
-```{r message=FALSE, warning=FALSE}
-merged_pca <- read_table2("temp1_ichip_1000g_sites_merged.eigenvec") 
+```{r}
+merged_pca <- read_table2("temp1_ichip_1000g_sites_merged.eigenvec", col_types = cols(.default = "c")) 
 
 merged_pca <- merged_pca %>%
-  mutate(FID = ifelse(FID == 0, IID, FID))
+  mutate(FID = ifelse(FID == "0", IID, FID)) %>%
+  mutate(PC1 = as.double(PC1)) %>%
+  mutate(PC2 = as.double(PC2))
 
 merged_admix_pop_pca <- left_join(merged_admix_pop, merged_pca, by = c("FAM" = "FID", "IID" = "IID"))
-merged_admix_pop_pca <- merged_admix_pop_pca %>% 
-  distinct(FID, .keep_all = TRUE)
 
 merged_admix_pop_pca %>%
   filter(Superpopulation.code != "-") %>%
@@ -368,7 +368,7 @@ merged_admix_pop_pca %>%
 ### Write Assigned 
 ```{r}
 merged_admix_pop_pca %>% 
-  filter(!FAM %in% onek_samples$Sample.name) %>%
+  filter(Superpopulation.code == "-") %>%
   filter(cedars_75_class == "EUR") %>%
   select(FAM, IID) %>%
   write_tsv(path = "ichip1t6_eur_samples.tsv", col_names = FALSE)

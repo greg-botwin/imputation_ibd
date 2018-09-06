@@ -22,3 +22,5 @@ original_data/
 *.missnp
 workflow/2.estimate_ancestry/ichip1t6_1000G_markers/
 workflow/2.estimate_ancestry/ichip7_1000G_markers/
+*.imiss
+*.lmiss

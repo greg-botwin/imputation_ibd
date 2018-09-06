@@ -231,7 +231,7 @@ plink2 \
     ##   --out temp4_ichip1t6
     ##   --set-all-var-ids @:#[hg19]
     ## 
-    ## Start time: Wed Sep  5 07:56:23 2018
+    ## Start time: Wed Sep  5 09:29:18 2018
     ## Note: --keep-allele-order no longer has any effect.
     ## 128908 MiB RAM detected; reserving 64454 MiB for main workspace.
     ## Using up to 48 threads (change this with --threads).
@@ -244,7 +244,7 @@ plink2 \
     ## Writing temp4_ichip1t6.bed ... 0%61%done.
     ## Writing temp4_ichip1t6.bim ... done.
     ## Writing temp4_ichip1t6.fam ... done.
-    ## End time: Wed Sep  5 07:56:23 2018
+    ## End time: Wed Sep  5 09:29:20 2018
 
 Process 1000 Genomes Data
 -------------------------
@@ -490,7 +490,7 @@ merged_fam <- read_table2("temp1_ichip_1000g_sites_merged.fam", col_names = c("F
                                   PHENOTYPE = col_integer()))
 
 merged_fam <- merged_fam %>%
-  mutate(FAM = ifelse(FAM == "0", IID, FAM))
+  mutate(FAM = if_else(FAM == "0", IID, FAM))
 
 merged_pop_file <- left_join(merged_fam, onek_samples, by = c("FAM" = "Sample.name")) 
 
@@ -594,14 +594,14 @@ plink \
 ### Plot PCAs
 
 ``` r
-merged_pca <- read_table2("temp1_ichip_1000g_sites_merged.eigenvec") 
+merged_pca <- read_table2("temp1_ichip_1000g_sites_merged.eigenvec", col_types = cols(.default = "c")) 
 
 merged_pca <- merged_pca %>%
-  mutate(FID = ifelse(FID == 0, IID, FID))
+  mutate(FID = ifelse(FID == "0", IID, FID)) %>%
+  mutate(PC1 = as.double(PC1)) %>%
+  mutate(PC2 = as.double(PC2))
 
 merged_admix_pop_pca <- left_join(merged_admix_pop, merged_pca, by = c("FAM" = "FID", "IID" = "IID"))
-merged_admix_pop_pca <- merged_admix_pop_pca %>% 
-  distinct(FID, .keep_all = TRUE)
 
 merged_admix_pop_pca %>%
   filter(Superpopulation.code != "-") %>%
@@ -649,7 +649,7 @@ merged_admix_pop_pca %>%
 
 ``` r
 merged_admix_pop_pca %>% 
-  filter(!FAM %in% onek_samples$Sample.name) %>%
+  filter(Superpopulation.code == "-") %>%
   filter(cedars_75_class == "EUR") %>%
   select(FAM, IID) %>%
   write_tsv(path = "ichip1t6_eur_samples.tsv", col_names = FALSE)
@@ -679,7 +679,6 @@ plink \
     ## 9971 people (4912 males, 5054 females, 5 ambiguous) loaded from .fam.
     ## Ambiguous sex IDs written to eur_cohort_split_ichip1t6.nosex .
     ## --keep: 8286 people remaining.
-    ## Warning: At least 11 duplicate IDs in --keep file.
     ## Using 1 thread (no multithreaded calculations invoked).
     ## Before main variant filters, 8286 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
@@ -699,4 +698,6 @@ file.remove(list.files(pattern = "^temp", full.names = TRUE))
     ##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
     ## [15] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
     ## [29] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-    ## [43] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+    ## [43] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+    ## [57] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+    ## [71] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
