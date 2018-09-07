@@ -75,6 +75,7 @@ plink \
 --geno 0.03 \
 --maf 0.01 \
 --hwe 0.000001 \
+--chr 1-22 \
 --keep-allele-order \
 --make-bed \
 --out temp3_ichip7

@@ -1,7 +1,7 @@
 ---
 title: "Split Cohorts and Perform Global Operations - Workflow"
 author: "Translational Genomics Group"
-date: "8/31/2018"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: github_document
 ---
 
@@ -54,11 +54,10 @@ plink \
 
 
 ## 2. Filter Markers for Issues
-Remove SNPs with 
-1. Has a mapping issue
-2. Sex Chromosome
-3. No BP Position (doesn't add anything)
-4. Insertion/Deletion
+Remove SNPs with:  
+1. Has a mapping issue  
+2. No BP Position (doesn't add anything)  
+3. Insertion/Deletion  
 
 ### A. Create List of Passing SNPs
 ```{r}
@@ -66,7 +65,6 @@ bim_annotated %>%
   filter(MappingComment == "None" | 
            MappingComment == "updated map position differs from position in ichip1to7top_unfiltered_e_bim" |
            MappingComment == "Previously mapped to Chr 5, but probe correctly matched to Chr 15.") %>%
-  filter(CHR %in% c(1:22)) %>%
   filter(!is.na(MapInfo_GRCh37)) %>%
   filter(insertion_deleton == FALSE) %>%
   select(Name) %>%
@@ -121,6 +119,7 @@ fam %>%
 ```{bash}
 plink \
 --bfile temp_2 \
+--geno 0.99 \
 --keep-fam temp_ichip1t6_samples.tsv \
 --make-bed \
 --out cohort_split_ichip1t6
@@ -130,6 +129,7 @@ plink \
 ```{bash}
 plink \
 --bfile temp_2 \
+--geno 0.99 \
 --keep-fam temp_ichip7_samples.tsv \
 --make-bed \
 --out cohort_split_ichip7
@@ -139,6 +139,7 @@ plink \
 ```{bash}
 plink \
 --bfile temp_2 \
+--geno 0.99 \
 --keep-fam temp_bbc_samples.tsv \
 --make-bed \
 --out cohort_split_bbc

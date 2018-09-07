@@ -80,6 +80,7 @@ plink \
 --geno 0.03 \
 --maf 0.01 \
 --hwe 0.000001 \
+--chr 1-22 \
 --keep-allele-order \
 --make-bed \
 --out temp3_ichip1t6
@@ -281,10 +282,10 @@ merged_admix_pop <- merged_admix_pop %>%
   mutate(cedars_75_class = if_else(EUR >= 0.75, "EUR",
                                     if_else(EAS >= 0.75, "EAS",
                                                     if_else(AFR >= 0.75, "AFR", "Mixed")))) %>%
-  mutate(kmeans_class = if_else(kmeans_cluster == 1, "Mixed",
-                                if_else(kmeans_cluster == 2, "AFR",
-                                        if_else(kmeans_cluster == 3, "EUR",
-                                                if_else(kmeans_cluster == 4, "EAS", "wilson")))))
+  mutate(kmeans_class = if_else(kmeans_cluster == 1, "EUR",
+                                if_else(kmeans_cluster == 2, "Mixed",
+                                        if_else(kmeans_cluster == 3, "EAS",
+                                                if_else(kmeans_cluster == 4, "AFR", "wilson")))))
 
 merged_admix_pop %>%
   filter(Superpopulation.code == "-") %>%

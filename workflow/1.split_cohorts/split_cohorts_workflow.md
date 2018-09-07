@@ -1,7 +1,7 @@
 Split Cohorts and Perform Global Operations - Workflow
 ================
 Translational Genomics Group
-8/31/2018
+06 September, 2018
 
 1. Update Bim Positions
 -----------------------
@@ -13,7 +13,7 @@ Translational Genomics Group
 annotation <- read_tsv("../../original_data/ichip_v2_v1_grch37_no_indels_annovar_annotation_25_jul_2018.tsv", 
                        col_types = cols(.default = "c"))
 
-# selection only necessary columns and change class
+# select only necessary columns and change class
 annotation <- annotation %>%
   select(Name, IlmnID, Chr, SNP, MapInfo_GRCh37, deCODEcM_GRCh37, RsID_dbsnp138, 
          For_Rev_Allele1_GRCh37, For_Rev_Allele2_GRCh37, Top_AlleleA, Top_AlleleB,
@@ -91,7 +91,10 @@ plink \
 2. Filter Markers for Issues
 ----------------------------
 
-Remove SNPs with 1. Has a mapping issue 2. Sex Chromosome 3. No BP Position (doesn't add anything) 4. Insertion/Deletion
+Remove SNPs with:
+1. Has a mapping issue
+2. No BP Position (doesn't add anything)
+3. Insertion/Deletion
 
 ### A. Create List of Passing SNPs
 
@@ -100,7 +103,6 @@ bim_annotated %>%
   filter(MappingComment == "None" | 
            MappingComment == "updated map position differs from position in ichip1to7top_unfiltered_e_bim" |
            MappingComment == "Previously mapped to Chr 5, but probe correctly matched to Chr 15.") %>%
-  filter(CHR %in% c(1:22)) %>%
   filter(!is.na(MapInfo_GRCh37)) %>%
   filter(insertion_deleton == FALSE) %>%
   select(Name) %>%
@@ -131,12 +133,16 @@ plink \
     ## 14856 people (7208 males, 7609 females, 39 ambiguous) loaded from .fam.
     ## Ambiguous sex IDs written to temp_2.nosex .
     ## 4224 phenotype values loaded from .fam.
-    ## --extract: 268093 variants remaining.
+    ## --extract: 270813 variants remaining.
     ## Using 1 thread (no multithreaded calculations invoked).
     ## Before main variant filters, 14856 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Total genotyping rate is 0.552244.
-    ## 268093 variants and 14856 people pass filters and QC.
+    ## Warning: 16041 het. haploid genotypes present (see temp_2.hh ); many commands
+    ## treat these as missing.
+    ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
+    ## treat these as missing.
+    ## Total genotyping rate is 0.550839.
+    ## 270813 variants and 14856 people pass filters and QC.
     ## Among remaining phenotypes, 0 are cases and 4224 are controls.  (10632
     ## phenotypes are missing.)
     ## --make-bed to temp_2.bed + temp_2.bim + temp_2.fam ... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
@@ -193,6 +199,7 @@ fam %>%
 ``` bash
 plink \
 --bfile temp_2 \
+--geno 0.99 \
 --keep-fam temp_ichip1t6_samples.tsv \
 --make-bed \
 --out cohort_split_ichip1t6
@@ -203,12 +210,13 @@ plink \
     ## Logging to cohort_split_ichip1t6.log.
     ## Options in effect:
     ##   --bfile temp_2
+    ##   --geno 0.99
     ##   --keep-fam temp_ichip1t6_samples.tsv
     ##   --make-bed
     ##   --out cohort_split_ichip1t6
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 268093 variants loaded from .bim file.
+    ## 270813 variants loaded from .bim file.
     ## 14856 people (7208 males, 7609 females, 39 ambiguous) loaded from .fam.
     ## Ambiguous sex IDs written to cohort_split_ichip1t6.nosex .
     ## 4224 phenotype values loaded from .fam.
@@ -216,8 +224,13 @@ plink \
     ## Using 1 thread (no multithreaded calculations invoked).
     ## Before main variant filters, 9971 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Total genotyping rate in remaining samples is 0.560781.
-    ## 268093 variants and 9971 people pass filters and QC.
+    ## Warning: 9917 het. haploid genotypes present (see cohort_split_ichip1t6.hh );
+    ## many commands treat these as missing.
+    ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
+    ## treat these as missing.
+    ## Total genotyping rate in remaining samples is 0.559539.
+    ## 91819 variants removed due to missing genotype data (--geno).
+    ## 178994 variants and 9971 people pass filters and QC.
     ## Note: No phenotypes present.
     ## --make-bed to cohort_split_ichip1t6.bed + cohort_split_ichip1t6.bim +
     ## cohort_split_ichip1t6.fam ... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
@@ -227,6 +240,7 @@ plink \
 ``` bash
 plink \
 --bfile temp_2 \
+--geno 0.99 \
 --keep-fam temp_ichip7_samples.tsv \
 --make-bed \
 --out cohort_split_ichip7
@@ -237,12 +251,13 @@ plink \
     ## Logging to cohort_split_ichip7.log.
     ## Options in effect:
     ##   --bfile temp_2
+    ##   --geno 0.99
     ##   --keep-fam temp_ichip7_samples.tsv
     ##   --make-bed
     ##   --out cohort_split_ichip7
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 268093 variants loaded from .bim file.
+    ## 270813 variants loaded from .bim file.
     ## 14856 people (7208 males, 7609 females, 39 ambiguous) loaded from .fam.
     ## Ambiguous sex IDs written to cohort_split_ichip7.nosex .
     ## 4224 phenotype values loaded from .fam.
@@ -250,8 +265,13 @@ plink \
     ## Using 1 thread (no multithreaded calculations invoked).
     ## Before main variant filters, 661 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Total genotyping rate in remaining samples is 0.914994.
-    ## 268093 variants and 661 people pass filters and QC.
+    ## Warning: 10 het. haploid genotypes present (see cohort_split_ichip7.hh ); many
+    ## commands treat these as missing.
+    ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
+    ## treat these as missing.
+    ## Total genotyping rate in remaining samples is 0.915066.
+    ## 22910 variants removed due to missing genotype data (--geno).
+    ## 247903 variants and 661 people pass filters and QC.
     ## Note: No phenotypes present.
     ## --make-bed to cohort_split_ichip7.bed + cohort_split_ichip7.bim +
     ## cohort_split_ichip7.fam ... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
@@ -261,6 +281,7 @@ plink \
 ``` bash
 plink \
 --bfile temp_2 \
+--geno 0.99 \
 --keep-fam temp_bbc_samples.tsv \
 --make-bed \
 --out cohort_split_bbc
@@ -271,12 +292,13 @@ plink \
     ## Logging to cohort_split_bbc.log.
     ## Options in effect:
     ##   --bfile temp_2
+    ##   --geno 0.99
     ##   --keep-fam temp_bbc_samples.tsv
     ##   --make-bed
     ##   --out cohort_split_bbc
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 268093 variants loaded from .bim file.
+    ## 270813 variants loaded from .bim file.
     ## 14856 people (7208 males, 7609 females, 39 ambiguous) loaded from .fam.
     ## Ambiguous sex IDs written to cohort_split_bbc.nosex .
     ## 4224 phenotype values loaded from .fam.
@@ -284,8 +306,11 @@ plink \
     ## Using 1 thread (no multithreaded calculations invoked).
     ## Before main variant filters, 4224 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Total genotyping rate in remaining samples is 0.475328.
-    ## 268093 variants and 4224 people pass filters and QC.
+    ## Warning: 6114 het. haploid genotypes present (see cohort_split_bbc.hh ); many
+    ## commands treat these as missing.
+    ## Total genotyping rate in remaining samples is 0.473304.
+    ## 142621 variants removed due to missing genotype data (--geno).
+    ## 128192 variants and 4224 people pass filters and QC.
     ## Among remaining phenotypes, 0 are cases and 4224 are controls.
     ## --make-bed to cohort_split_bbc.bed + cohort_split_bbc.bim +
     ## cohort_split_bbc.fam ... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
@@ -294,8 +319,8 @@ Clean Up
 --------
 
 ``` r
-file.remove(list.files(pattern = "temp", full.names = TRUE))
+file.remove(list.files(pattern = "^temp", full.names = TRUE))
 ```
 
     ##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-    ## [15] TRUE TRUE
+    ## [15] TRUE TRUE TRUE
