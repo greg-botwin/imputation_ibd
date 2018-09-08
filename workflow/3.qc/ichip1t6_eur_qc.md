@@ -1,7 +1,7 @@
 iChip 1 through 6 European QC
 ================
 Translational Genomics Group
-07 September, 2018
+08 September, 2018
 
 Set-up
 ------
@@ -343,7 +343,7 @@ plink \
 --out temp_eur_cohort_split_ichip1t6 &>/dev/null
 ```
 
-Pruning complete. 12368 variants excluded removed in high ld. 77285 of 121314 variants removed. I will keep only the prune.in snps for the subsequent analysis.
+Pruning complete. 12358 variants excluded removed in high ld. 77286 of 120892 variants removed. I will keep only the prune.in snps for the subsequent analysis.
 
 -   Can add --min 0.12 to identify minimum pihat for genome output to manage size of output dataset (will only output pihat &gt;0.12)
 -   PIHAT 1.0 = monozygotic twins or known replicates
