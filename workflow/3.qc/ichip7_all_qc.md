@@ -1,4 +1,4 @@
-iChip 7 European QC
+iChip 7 All Ancestry QC
 ================
 Translational Genomics Group
 07 September, 2018
@@ -11,7 +11,7 @@ This document is broken down into three parts. - Part 1 Identifies QC issues - P
 Source Data
 -----------
 
-European IBD IChip, Run 7, Illumina's TOP Allele Called, aligned to HG19.
+All Ancestry IBD IChip, Run 7, Illumina's TOP Allele Called, aligned to HG19.
 
 Part 1 - Identify QC Issues
 ===========================
@@ -30,94 +30,97 @@ Identification of individuals with discordant sex information WITH --geno and --
 
 ``` bash
 plink \
---bfile ../2.estimate_ancestry/eur_cohort_split_ichip7 \
+--bfile ../1.split_cohorts/cohort_split_ichip7 \
 --geno 0.03 \
 --maf 0.05 \
 --check-sex .4 .8 \
---out temp_eur_cohort_split_ichip7
+--out temp_cohort_split_ichip7
 ```
 
     ## PLINK v1.90b5.4 64-bit (10 Apr 2018)           www.cog-genomics.org/plink/1.9/
     ## (C) 2005-2018 Shaun Purcell, Christopher Chang   GNU General Public License v3
-    ## Logging to temp_eur_cohort_split_ichip7.log.
+    ## Logging to temp_cohort_split_ichip7.log.
     ## Options in effect:
-    ##   --bfile ../2.estimate_ancestry/eur_cohort_split_ichip7
+    ##   --bfile ../1.split_cohorts/cohort_split_ichip7
     ##   --check-sex .4 .8
     ##   --geno 0.03
     ##   --maf 0.05
-    ##   --out temp_eur_cohort_split_ichip7
+    ##   --out temp_cohort_split_ichip7
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
     ## 247903 variants loaded from .bim file.
-    ## 580 people (273 males, 273 females, 34 ambiguous) loaded from .fam.
-    ## Ambiguous sex IDs written to temp_eur_cohort_split_ichip7.nosex .
+    ## 661 people (313 males, 314 females, 34 ambiguous) loaded from .fam.
+    ## Ambiguous sex IDs written to temp_cohort_split_ichip7.nosex .
     ## Using 1 thread (no multithreaded calculations invoked).
-    ## Before main variant filters, 580 founders and 0 nonfounders present.
+    ## Before main variant filters, 661 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Warning: 10 het. haploid genotypes present (see temp_eur_cohort_split_ichip7.hh
-    ## ); many commands treat these as missing.
+    ## Warning: 10 het. haploid genotypes present (see temp_cohort_split_ichip7.hh );
+    ## many commands treat these as missing.
     ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
     ## treat these as missing.
-    ## Total genotyping rate is 0.999625.
-    ## 18 variants removed due to missing genotype data (--geno).
-    ## 66680 variants removed due to minor allele threshold(s)
+    ## Total genotyping rate is 0.999632.
+    ## 17 variants removed due to missing genotype data (--geno).
+    ## 65379 variants removed due to minor allele threshold(s)
     ## (--maf/--max-maf/--mac/--max-mac).
-    ## 181205 variants and 580 people pass filters and QC.
+    ## 182507 variants and 661 people pass filters and QC.
     ## Note: No phenotypes present.
-    ## --check-sex: 788 Xchr and 0 Ychr variant(s) scanned, 38 problems detected.
-    ## Report written to temp_eur_cohort_split_ichip7.sexcheck .
+    ## --check-sex: 792 Xchr and 0 Ychr variant(s) scanned, 41 problems detected.
+    ## Report written to temp_cohort_split_ichip7.sexcheck .
 
-Using 788 Xchr variants to check sex; 38 problems detected
+Using 792 Xchr variants to check sex; 41 problems detected
 
 ``` r
-sexcheck <- read_table2(file = "temp_eur_cohort_split_ichip7.sexcheck")
+sexcheck <- read_table2(file = "temp_cohort_split_ichip7.sexcheck")
 sexcheck %>%
   filter(STATUS == "PROBLEM") %>%
   kable(caption = "List of Individuals with Sex Check Problems")
 ```
 
-| FID        |  IID|  PEDSEX|  SNPSEX| STATUS  |         F|
-|:-----------|----:|-------:|-------:|:--------|---------:|
-| 0500928    |    1|       2|       0| PROBLEM |  0.418900|
-| 1201279    |    1|       2|       0| PROBLEM |  0.400700|
-| 1400212    |    1|       2|       0| PROBLEM |  0.433400|
-| 1500141    |    1|       2|       0| PROBLEM |  0.426100|
-| Control1   |    1|       0|       2| PROBLEM |  0.008438|
-| Control2   |    1|       0|       2| PROBLEM |  0.008438|
-| Control3   |    1|       0|       2| PROBLEM |  0.008438|
-| Control4   |    1|       0|       2| PROBLEM |  0.008438|
-| Control5   |    1|       0|       2| PROBLEM |  0.008438|
-| Control6   |    1|       0|       2| PROBLEM |  0.008438|
-| Control7   |    1|       0|       2| PROBLEM |  0.007384|
-| Control8   |    1|       0|       2| PROBLEM |  0.010750|
-| Control9   |    1|       0|       2| PROBLEM |  0.008438|
-| Control10  |    1|       0|       2| PROBLEM |  0.010300|
-| Control11  |    1|       0|       2| PROBLEM |  0.008438|
-| Control12  |    1|       0|       2| PROBLEM |  0.008438|
-| Control13  |    1|       0|       2| PROBLEM |  0.008438|
-| Control14  |    1|       0|       2| PROBLEM |  0.008438|
-| Control15  |    1|       0|       2| PROBLEM |  0.008438|
-| Control16  |    1|       0|       2| PROBLEM |  0.008438|
-| Control17  |    1|       0|       2| PROBLEM |  0.008438|
-| Control18  |    1|       0|       2| PROBLEM |  0.008438|
-| Control19  |    1|       0|       2| PROBLEM |  0.008438|
-| Control20  |    1|       0|       2| PROBLEM |  0.008438|
-| Control21  |    1|       0|       2| PROBLEM |  0.008438|
-| Control22  |    1|       0|       2| PROBLEM |  0.008438|
-| Control23  |    1|       0|       2| PROBLEM |  0.008438|
-| Control24  |    1|       0|       2| PROBLEM |  0.008438|
-| Control25  |    1|       0|       2| PROBLEM |  0.008438|
-| Control26  |    1|       0|       2| PROBLEM |  0.008438|
-| Control27  |    1|       0|       2| PROBLEM |  0.008438|
-| Control29  |    1|       0|       2| PROBLEM |  0.008438|
-| Control29R |    1|       0|       2| PROBLEM |  0.007384|
-| Control30  |    1|       0|       2| PROBLEM |  0.008438|
-| Control30R |    1|       0|       2| PROBLEM |  0.008438|
-| Control31  |    1|       0|       2| PROBLEM |  0.008438|
-| Control32  |    1|       0|       2| PROBLEM |  0.008438|
-| Control33  |    1|       0|       2| PROBLEM |  0.008438|
+| FID        |  IID|  PEDSEX|  SNPSEX| STATUS  |        F|
+|:-----------|----:|-------:|-------:|:--------|--------:|
+| 0500928    |    1|       2|       0| PROBLEM |  0.42910|
+| 1201279    |    1|       2|       0| PROBLEM |  0.41480|
+| 1400212    |    1|       2|       0| PROBLEM |  0.43980|
+| 1500017    |    1|       2|       0| PROBLEM |  0.40770|
+| 1500049    |    1|       2|       0| PROBLEM |  0.40060|
+| 1500141    |    1|       2|       0| PROBLEM |  0.42200|
+| 1500353    |    1|       2|       0| PROBLEM |  0.40410|
+| Control1   |    1|       0|       2| PROBLEM |  0.02591|
+| Control2   |    1|       0|       2| PROBLEM |  0.02591|
+| Control3   |    1|       0|       2| PROBLEM |  0.02591|
+| Control4   |    1|       0|       2| PROBLEM |  0.02591|
+| Control5   |    1|       0|       2| PROBLEM |  0.02591|
+| Control6   |    1|       0|       2| PROBLEM |  0.02591|
+| Control7   |    1|       0|       2| PROBLEM |  0.02496|
+| Control8   |    1|       0|       2| PROBLEM |  0.02812|
+| Control9   |    1|       0|       2| PROBLEM |  0.02591|
+| Control10  |    1|       0|       2| PROBLEM |  0.02775|
+| Control11  |    1|       0|       2| PROBLEM |  0.02591|
+| Control12  |    1|       0|       2| PROBLEM |  0.02591|
+| Control13  |    1|       0|       2| PROBLEM |  0.02591|
+| Control14  |    1|       0|       2| PROBLEM |  0.02591|
+| Control15  |    1|       0|       2| PROBLEM |  0.02591|
+| Control16  |    1|       0|       2| PROBLEM |  0.02591|
+| Control17  |    1|       0|       2| PROBLEM |  0.02591|
+| Control18  |    1|       0|       2| PROBLEM |  0.02591|
+| Control19  |    1|       0|       2| PROBLEM |  0.02591|
+| Control20  |    1|       0|       2| PROBLEM |  0.02591|
+| Control21  |    1|       0|       2| PROBLEM |  0.02591|
+| Control22  |    1|       0|       2| PROBLEM |  0.02591|
+| Control23  |    1|       0|       2| PROBLEM |  0.02591|
+| Control24  |    1|       0|       2| PROBLEM |  0.02591|
+| Control25  |    1|       0|       2| PROBLEM |  0.02591|
+| Control26  |    1|       0|       2| PROBLEM |  0.02591|
+| Control27  |    1|       0|       2| PROBLEM |  0.02591|
+| Control29  |    1|       0|       2| PROBLEM |  0.02591|
+| Control29R |    1|       0|       2| PROBLEM |  0.02496|
+| Control30  |    1|       0|       2| PROBLEM |  0.02591|
+| Control30R |    1|       0|       2| PROBLEM |  0.02591|
+| Control31  |    1|       0|       2| PROBLEM |  0.02591|
+| Control32  |    1|       0|       2| PROBLEM |  0.02591|
+| Control33  |    1|       0|       2| PROBLEM |  0.02591|
 
-38 problems detected, but this is beause many control samples are blank for Sex. Not real problems. 4 actual sex problems.
+41 problems detected, but this is beause many control samples are blank for Sex. Not real problems. 7 actual sex problems.
 
 ``` r
 sexcheck %>%
@@ -128,12 +131,15 @@ sexcheck %>%
 
 | FID     |  IID|  PEDSEX|  SNPSEX| STATUS  |       F|
 |:--------|----:|-------:|-------:|:--------|-------:|
-| 0500928 |    1|       2|       0| PROBLEM |  0.4189|
-| 1201279 |    1|       2|       0| PROBLEM |  0.4007|
-| 1400212 |    1|       2|       0| PROBLEM |  0.4334|
-| 1500141 |    1|       2|       0| PROBLEM |  0.4261|
+| 0500928 |    1|       2|       0| PROBLEM |  0.4291|
+| 1201279 |    1|       2|       0| PROBLEM |  0.4148|
+| 1400212 |    1|       2|       0| PROBLEM |  0.4398|
+| 1500017 |    1|       2|       0| PROBLEM |  0.4077|
+| 1500049 |    1|       2|       0| PROBLEM |  0.4006|
+| 1500141 |    1|       2|       0| PROBLEM |  0.4220|
+| 1500353 |    1|       2|       0| PROBLEM |  0.4041|
 
-4 of 4 sex problems come from a reported PEDSEX of Female but an F &gt; 0.4.
+7 of 7 sex problems come from a reported PEDSEX of Female but an F &gt; 0.4.
 
 ``` r
 sexcheck %>%
@@ -142,7 +148,7 @@ sexcheck %>%
   labs(title = "Heterozygoisty Rates for Samples Filtered with geno/maf included") 
 ```
 
-![](ichip7_eur_qc_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](ichip7_all_qc_files/figure-markdown_github/unnamed-chunk-4-1.png)
 
 Plotting F from check-sex based on chrX heterozygosity rates (F&lt;0.4, M&gt;0.8 expected). We can see that they nicely seperate as expected.
 
@@ -159,58 +165,58 @@ Identification of individuals with elevated missing data rates or outlying heter
 
 ``` bash
 plink \
---bfile ../2.estimate_ancestry/eur_cohort_split_ichip7 \
+--bfile ../1.split_cohorts/cohort_split_ichip7 \
 --missing \
---out temp_eur_cohort_split_ichip7 
+--out temp_cohort_split_ichip7 
 ```
 
     ## PLINK v1.90b5.4 64-bit (10 Apr 2018)           www.cog-genomics.org/plink/1.9/
     ## (C) 2005-2018 Shaun Purcell, Christopher Chang   GNU General Public License v3
-    ## Logging to temp_eur_cohort_split_ichip7.log.
+    ## Logging to temp_cohort_split_ichip7.log.
     ## Options in effect:
-    ##   --bfile ../2.estimate_ancestry/eur_cohort_split_ichip7
+    ##   --bfile ../1.split_cohorts/cohort_split_ichip7
     ##   --missing
-    ##   --out temp_eur_cohort_split_ichip7
+    ##   --out temp_cohort_split_ichip7
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
     ## 247903 variants loaded from .bim file.
-    ## 580 people (273 males, 273 females, 34 ambiguous) loaded from .fam.
-    ## Ambiguous sex IDs written to temp_eur_cohort_split_ichip7.nosex .
+    ## 661 people (313 males, 314 females, 34 ambiguous) loaded from .fam.
+    ## Ambiguous sex IDs written to temp_cohort_split_ichip7.nosex .
     ## Using 1 thread (no multithreaded calculations invoked).
-    ## Before main variant filters, 580 founders and 0 nonfounders present.
+    ## Before main variant filters, 661 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Warning: 10 het. haploid genotypes present (see temp_eur_cohort_split_ichip7.hh
-    ## ); many commands treat these as missing.
+    ## Warning: 10 het. haploid genotypes present (see temp_cohort_split_ichip7.hh );
+    ## many commands treat these as missing.
     ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
     ## treat these as missing.
-    ## Total genotyping rate is 0.999625.
+    ## Total genotyping rate is 0.999632.
     ## --missing: Sample missing data report written to
-    ## temp_eur_cohort_split_ichip7.imiss, and variant-based missing data report
-    ## written to temp_eur_cohort_split_ichip7.lmiss.
+    ## temp_cohort_split_ichip7.imiss, and variant-based missing data report written
+    ## to temp_cohort_split_ichip7.lmiss.
 
-Total genotyping rate is 0.999625.
+Total genotyping rate is 0.999632.
 
 ``` r
-lmiss <- read_table("temp_eur_cohort_split_ichip7.lmiss")
+lmiss <- read_table("temp_cohort_split_ichip7.lmiss")
 lmiss %>%
   ggplot(aes(x = F_MISS)) +
   geom_density() +
   labs(title = "SNP Level Missingess")
 ```
 
-![](ichip7_eur_qc_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](ichip7_all_qc_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
 Low missingness across iChip7
 
 ``` r
-imiss <- read_table("temp_eur_cohort_split_ichip7.imiss")
+imiss <- read_table("temp_cohort_split_ichip7.imiss")
 imiss %>%
   ggplot(aes(x = F_MISS)) +
   geom_histogram(bins = 100) +
   labs(title = "Sample Level Missingess")
 ```
 
-![](ichip7_eur_qc_files/figure-markdown_github/unnamed-chunk-7-1.png)
+![](ichip7_all_qc_files/figure-markdown_github/unnamed-chunk-7-1.png)
 
 Small amount of missingness
 
@@ -238,38 +244,38 @@ No samples with &gt; 3% missingness.
 
 ``` bash
 plink \
---bfile ../2.estimate_ancestry/eur_cohort_split_ichip7 \
+--bfile ../1.split_cohorts/cohort_split_ichip7 \
 --het \
---out temp_eur_cohort_split_ichip7
+--out temp_cohort_split_ichip7
 ```
 
     ## PLINK v1.90b5.4 64-bit (10 Apr 2018)           www.cog-genomics.org/plink/1.9/
     ## (C) 2005-2018 Shaun Purcell, Christopher Chang   GNU General Public License v3
-    ## Logging to temp_eur_cohort_split_ichip7.log.
+    ## Logging to temp_cohort_split_ichip7.log.
     ## Options in effect:
-    ##   --bfile ../2.estimate_ancestry/eur_cohort_split_ichip7
+    ##   --bfile ../1.split_cohorts/cohort_split_ichip7
     ##   --het
-    ##   --out temp_eur_cohort_split_ichip7
+    ##   --out temp_cohort_split_ichip7
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
     ## 247903 variants loaded from .bim file.
-    ## 580 people (273 males, 273 females, 34 ambiguous) loaded from .fam.
-    ## Ambiguous sex IDs written to temp_eur_cohort_split_ichip7.nosex .
+    ## 661 people (313 males, 314 females, 34 ambiguous) loaded from .fam.
+    ## Ambiguous sex IDs written to temp_cohort_split_ichip7.nosex .
     ## Using 1 thread (no multithreaded calculations invoked).
-    ## Before main variant filters, 580 founders and 0 nonfounders present.
+    ## Before main variant filters, 661 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Warning: 10 het. haploid genotypes present (see temp_eur_cohort_split_ichip7.hh
-    ## ); many commands treat these as missing.
+    ## Warning: 10 het. haploid genotypes present (see temp_cohort_split_ichip7.hh );
+    ## many commands treat these as missing.
     ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
     ## treat these as missing.
-    ## Total genotyping rate is 0.999625.
-    ## 247903 variants and 580 people pass filters and QC.
+    ## Total genotyping rate is 0.999632.
+    ## 247903 variants and 661 people pass filters and QC.
     ## Note: No phenotypes present.
-    ## --het: 228885 variants scanned, report written to
-    ## temp_eur_cohort_split_ichip7.het .
+    ## --het: 234259 variants scanned, report written to temp_cohort_split_ichip7.het
+    ## .
 
 ``` r
-het <- read_table("temp_eur_cohort_split_ichip7.het") 
+het <- read_table("temp_cohort_split_ichip7.het") 
 het <- het %>%
   mutate(obs_het_rate = (`N(NM)` - `O(HOM)`)/`E(HOM)`)
 imiss_het <- left_join(imiss, het, by = "FID")
@@ -284,7 +290,7 @@ ggplot(imiss_het, aes(x = F_MISS, y = obs_het_rate)) +
   geom_hline(yintercept = (mean(imiss_het$obs_het_rate)-(3*sd(imiss_het$obs_het_rate))), color = "red")
 ```
 
-![](ichip7_eur_qc_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](ichip7_all_qc_files/figure-markdown_github/unnamed-chunk-10-1.png)
 
 ### Identify het outliers
 
@@ -295,14 +301,27 @@ imiss_het %>%
   kable(caption = "Samples That Fail Het Check")
 ```
 
-| FID      |  IID.x| MISS\_PHENO |  N\_MISS|  N\_GENO|    F\_MISS|  IID.y|  O(HOM)|  E(HOM)|   N(NM)|         F|  obs\_het\_rate|
-|:---------|------:|:------------|--------:|--------:|----------:|------:|-------:|-------:|-------:|---------:|---------------:|
-| 1400090  |      1| Y           |      682|   247903|  0.0027510|      1|  170585|  165400|  228338|   0.08205|       0.3491717|
-| 1400152  |      1| Y           |       32|   247903|  0.0001291|      1|  170130|  165800|  228854|   0.06881|       0.3541858|
-| 1400186  |      1| Y           |       33|   247903|  0.0001331|      1|  161621|  165800|  228854|  -0.06607|       0.4055066|
-| 1500019  |      1| Y           |       42|   247903|  0.0001694|      1|  171164|  165800|  228847|   0.08530|       0.3479071|
-| 1500052  |      1| Y           |      164|   247903|  0.0006615|      1|  161324|  165700|  228734|  -0.06944|       0.4068196|
-| 1600092S |      1| Y           |       57|   246816|  0.0002309|      1|  172252|  165800|  228836|   0.10270|       0.3412786|
+| FID      |  IID.x| MISS\_PHENO |  N\_MISS|  N\_GENO|    F\_MISS|  IID.y|  O(HOM)|  E(HOM)|   N(NM)|        F|  obs\_het\_rate|
+|:---------|------:|:------------|--------:|--------:|----------:|------:|-------:|-------:|-------:|--------:|---------------:|
+| 0801110  |      1| Y           |       31|   247903|  0.0001250|      1|  180938|  170600|  234230|   0.1625|       0.3123798|
+| 1300052  |      1| Y           |       19|   247903|  0.0000766|      1|  179719|  170600|  234245|   0.1432|       0.3196131|
+| 1400019S |      1| Y           |      236|   246816|  0.0009562|      1|  178955|  170500|  234041|   0.1336|       0.3230850|
+| 1400143  |      1| Y           |       87|   246816|  0.0003525|      1|  163671|  170600|  234180|  -0.1083|       0.4133001|
+| 1400202  |      1| Y           |     1203|   247903|  0.0048530|      1|  180089|  169800|  233177|   0.1618|       0.3126502|
+| 1400247  |      1| Y           |       24|   247903|  0.0000968|      1|  179602|  170600|  234236|   0.1415|       0.3202462|
+| 1400249  |      1| Y           |       20|   247903|  0.0000807|      1|  179414|  170600|  234241|   0.1385|       0.3213775|
+| 1500037  |      1| Y           |       39|   246816|  0.0001580|      1|  164987|  170600|  234225|  -0.0881|       0.4058499|
+| 1500076  |      1| Y           |       45|   246816|  0.0001823|      1|  177422|  170600|  234215|   0.1075|       0.3329015|
+| 1500090  |      1| Y           |       13|   246816|  0.0000527|      1|  180206|  170600|  234247|   0.1508|       0.3167702|
+| 1500100  |      1| Y           |       27|   246816|  0.0001094|      1|  179545|  170600|  234235|   0.1406|       0.3205744|
+| 1500190  |      1| Y           |       19|   247903|  0.0000766|      1|  180990|  170600|  234243|   0.1632|       0.3121512|
+| 1500197  |      1| Y           |       11|   246816|  0.0000446|      1|  180201|  170600|  234248|   0.1507|       0.3168054|
+| 1500198  |      1| Y           |       14|   246816|  0.0000567|      1|  180523|  170600|  234246|   0.1558|       0.3149062|
+| 1500210  |      1| Y           |        9|   246816|  0.0000365|      1|  179554|  170600|  234251|   0.1406|       0.3206155|
+| 1500213  |      1| Y           |       57|   247903|  0.0002299|      1|  164087|  170600|  234206|  -0.1020|       0.4110141|
+| 1500343  |      1| Y           |       44|   246816|  0.0001783|      1|  179696|  170600|  234231|   0.1430|       0.3196659|
+| 1500353  |      1| Y           |       47|   246816|  0.0001904|      1|  179958|  170600|  234218|   0.1472|       0.3180539|
+| 1600092S |      1| Y           |       57|   246816|  0.0002309|      1|  177625|  170600|  234209|   0.1108|       0.3316764|
 
 ``` r
 imiss_het %>%
@@ -312,43 +331,43 @@ imiss_het %>%
   write_tsv("fail-het-outlier.txt", col_names = FALSE)
 ```
 
-1 samples failed het check at +/- 4SD, 6 +/1 3SD. Only use 4SD with &gt; 1000 Samples.
+1 samples failed het check at +/- 4SD, 19 +/1 3SD. Only use 4SD with &gt; 1000 Samples.
 
 Calculate Overall project MAF before Filtering
 ----------------------------------------------
 
 ``` bash
 plink \
---bfile ../2.estimate_ancestry/eur_cohort_split_ichip7 \
+--bfile ../1.split_cohorts/cohort_split_ichip7 \
 --freq \
---out temp_eur_cohort_split_ichip7
+--out temp_cohort_split_ichip7
 ```
 
     ## PLINK v1.90b5.4 64-bit (10 Apr 2018)           www.cog-genomics.org/plink/1.9/
     ## (C) 2005-2018 Shaun Purcell, Christopher Chang   GNU General Public License v3
-    ## Logging to temp_eur_cohort_split_ichip7.log.
+    ## Logging to temp_cohort_split_ichip7.log.
     ## Options in effect:
-    ##   --bfile ../2.estimate_ancestry/eur_cohort_split_ichip7
+    ##   --bfile ../1.split_cohorts/cohort_split_ichip7
     ##   --freq
-    ##   --out temp_eur_cohort_split_ichip7
+    ##   --out temp_cohort_split_ichip7
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
     ## 247903 variants loaded from .bim file.
-    ## 580 people (273 males, 273 females, 34 ambiguous) loaded from .fam.
-    ## Ambiguous sex IDs written to temp_eur_cohort_split_ichip7.nosex .
+    ## 661 people (313 males, 314 females, 34 ambiguous) loaded from .fam.
+    ## Ambiguous sex IDs written to temp_cohort_split_ichip7.nosex .
     ## Using 1 thread (no multithreaded calculations invoked).
-    ## Before main variant filters, 580 founders and 0 nonfounders present.
+    ## Before main variant filters, 661 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Warning: 10 het. haploid genotypes present (see temp_eur_cohort_split_ichip7.hh
-    ## ); many commands treat these as missing.
+    ## Warning: 10 het. haploid genotypes present (see temp_cohort_split_ichip7.hh );
+    ## many commands treat these as missing.
     ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
     ## treat these as missing.
-    ## Total genotyping rate is 0.999625.
+    ## Total genotyping rate is 0.999632.
     ## --freq: Allele frequencies (founders only) written to
-    ## temp_eur_cohort_split_ichip7.frq .
+    ## temp_cohort_split_ichip7.frq .
 
 ``` r
-maffreq <- read_table2("temp_eur_cohort_split_ichip7.frq")
+maffreq <- read_table2("temp_cohort_split_ichip7.frq")
 maffreq %>%
   ggplot(aes(x = MAF)) +
   geom_histogram(aes(y =..density..)) +
@@ -356,7 +375,7 @@ maffreq %>%
   labs(title = "Overall MAF Prior to Filtering")
 ```
 
-![](ichip7_eur_qc_files/figure-markdown_github/unnamed-chunk-13-1.png)
+![](ichip7_all_qc_files/figure-markdown_github/unnamed-chunk-13-1.png)
 
 Identification of Duplicated or Related Individuals
 ---------------------------------------------------
@@ -366,10 +385,10 @@ Identification of Duplicated or Related Individuals
 
 ``` bash
 plink \
---bfile ../2.estimate_ancestry/eur_cohort_split_ichip7 \
+--bfile ../1.split_cohorts/cohort_split_ichip7 \
 --exclude range ../../original_data/highLDregions.txt \
 --indep 50 5 1.8 \
---out temp_eur_cohort_split_ichip7 &>/dev/null
+--out temp_cohort_split_ichip7 &>/dev/null
 ```
 
 Pruning complete. 12368 variants excluded removed in high ld. 77285 of 121314 variants removed. I will keep only the prune.in snps for the subsequent analysis.
@@ -382,15 +401,15 @@ Pruning complete. 12368 variants excluded removed in high ld. 77285 of 121314 va
 
 ``` bash
 plink \
---bfile ../2.estimate_ancestry/eur_cohort_split_ichip7 \
---extract temp_eur_cohort_split_ichip7.prune.in \
+--bfile ../1.split_cohorts/cohort_split_ichip7 \
+--extract temp_cohort_split_ichip7.prune.in \
 --genome \
 --min 0.12 \
---out temp_eur_cohort_split_ichip7 &>/dev/null
+--out temp_cohort_split_ichip7 &>/dev/null
 ```
 
 ``` r
-genome <- read_table2("temp_eur_cohort_split_ichip7.genome")
+genome <- read_table2("temp_cohort_split_ichip7.genome")
 
 genome <- genome %>%
   mutate(PI_HAT = as.double(PI_HAT)) %>%
@@ -407,7 +426,7 @@ genome %>%
        y = "Z1 the proportion of loci where the pair shares one allele") 
 ```
 
-![](ichip7_eur_qc_files/figure-markdown_github/unnamed-chunk-16-1.png)
+![](ichip7_all_qc_files/figure-markdown_github/unnamed-chunk-16-1.png)
 
 The above plot is restricted to samples with a PI\_HAT atleast 0.12. Samples can be represented more than once if multiple relations are found.
 
@@ -418,7 +437,7 @@ genome %>%
   labs(title = "Distribution of PI_HAT for Related Individuals >0.12", x = "PI_HAT", y = "Count (non-unique)")
 ```
 
-![](ichip7_eur_qc_files/figure-markdown_github/unnamed-chunk-17-1.png)
+![](ichip7_all_qc_files/figure-markdown_github/unnamed-chunk-17-1.png)
 
 ``` r
 genome %>%
@@ -529,10 +548,13 @@ sexcheck %>%
 
 | FID     |  IID|  PEDSEX|  SNPSEX| STATUS  |       F|
 |:--------|----:|-------:|-------:|:--------|-------:|
-| 0500928 |    1|       2|       0| PROBLEM |  0.4189|
-| 1201279 |    1|       2|       0| PROBLEM |  0.4007|
-| 1400212 |    1|       2|       0| PROBLEM |  0.4334|
-| 1500141 |    1|       2|       0| PROBLEM |  0.4261|
+| 0500928 |    1|       2|       0| PROBLEM |  0.4291|
+| 1201279 |    1|       2|       0| PROBLEM |  0.4148|
+| 1400212 |    1|       2|       0| PROBLEM |  0.4398|
+| 1500017 |    1|       2|       0| PROBLEM |  0.4077|
+| 1500049 |    1|       2|       0| PROBLEM |  0.4006|
+| 1500141 |    1|       2|       0| PROBLEM |  0.4220|
+| 1500353 |    1|       2|       0| PROBLEM |  0.4041|
 
 ``` r
 sexcheck %>%
@@ -544,49 +566,49 @@ sexcheck %>%
   write_tsv(path = "fail-updated-sex-check.txt", col_names = FALSE)
 ```
 
-These are 3 female samples, that have out of range but quasi-reasonable F. I will remove. Disucssed with Talin.
+These are 7 female samples, that have out of range but quasi-reasonable F. I will remove. Disucssed with Talin.
 
 #### Update Sex in PLINK
 
 ``` bash
 plink \
---bfile ../2.estimate_ancestry/eur_cohort_split_ichip7 \
+--bfile ../1.split_cohorts/cohort_split_ichip7 \
 --update-sex update-missing-sex.txt \
 --remove fail-updated-sex-check.txt \
 --make-bed \
---out temp1_eur_cohort_split_ichip7
+--out temp1_cohort_split_ichip7
 ```
 
     ## PLINK v1.90b5.4 64-bit (10 Apr 2018)           www.cog-genomics.org/plink/1.9/
     ## (C) 2005-2018 Shaun Purcell, Christopher Chang   GNU General Public License v3
-    ## Logging to temp1_eur_cohort_split_ichip7.log.
+    ## Logging to temp1_cohort_split_ichip7.log.
     ## Options in effect:
-    ##   --bfile ../2.estimate_ancestry/eur_cohort_split_ichip7
+    ##   --bfile ../1.split_cohorts/cohort_split_ichip7
     ##   --make-bed
-    ##   --out temp1_eur_cohort_split_ichip7
+    ##   --out temp1_cohort_split_ichip7
     ##   --remove fail-updated-sex-check.txt
     ##   --update-sex update-missing-sex.txt
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
     ## 247903 variants loaded from .bim file.
-    ## 580 people (273 males, 273 females, 34 ambiguous) loaded from .fam.
-    ## Ambiguous sex IDs written to temp1_eur_cohort_split_ichip7.nosex .
+    ## 661 people (313 males, 314 females, 34 ambiguous) loaded from .fam.
+    ## Ambiguous sex IDs written to temp1_cohort_split_ichip7.nosex .
     ## --update-sex: 34 people updated.
-    ## --remove: 576 people remaining.
+    ## --remove: 654 people remaining.
     ## Using 1 thread (no multithreaded calculations invoked).
-    ## Before main variant filters, 576 founders and 0 nonfounders present.
+    ## Before main variant filters, 654 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Warning: 10 het. haploid genotypes present (see
-    ## temp1_eur_cohort_split_ichip7.hh ); many commands treat these as missing.
+    ## Warning: 10 het. haploid genotypes present (see temp1_cohort_split_ichip7.hh );
+    ## many commands treat these as missing.
     ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
     ## treat these as missing.
-    ## Total genotyping rate in remaining samples is 0.999623.
-    ## 247903 variants and 576 people pass filters and QC.
+    ## Total genotyping rate in remaining samples is 0.999629.
+    ## 247903 variants and 654 people pass filters and QC.
     ## Note: No phenotypes present.
-    ## --make-bed to temp1_eur_cohort_split_ichip7.bed +
-    ## temp1_eur_cohort_split_ichip7.bim + temp1_eur_cohort_split_ichip7.fam ... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
+    ## --make-bed to temp1_cohort_split_ichip7.bed + temp1_cohort_split_ichip7.bim +
+    ## temp1_cohort_split_ichip7.fam ... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
 
---update-sex: 34 people updated. --Removed 4 samples. Went from 580 to 876 subjects. All F
+--update-sex: 34 people updated. --Removed 7 samples. Went from 661 to 654 subjects. All F
 
 ### Exclude Samples with IBD &gt; 0.8
 
@@ -633,128 +655,128 @@ duplicates_to_remove <- relateds %>%
 
 ``` bash
 plink \
---bfile temp1_eur_cohort_split_ichip7 \
+--bfile temp1_cohort_split_ichip7 \
 --remove fail-IBD-QC.tsv \
 --make-bed \
---out temp2_eur_cohort_split_ichip7
+--out temp2_cohort_split_ichip7
 ```
 
     ## PLINK v1.90b5.4 64-bit (10 Apr 2018)           www.cog-genomics.org/plink/1.9/
     ## (C) 2005-2018 Shaun Purcell, Christopher Chang   GNU General Public License v3
-    ## Logging to temp2_eur_cohort_split_ichip7.log.
+    ## Logging to temp2_cohort_split_ichip7.log.
     ## Options in effect:
-    ##   --bfile temp1_eur_cohort_split_ichip7
+    ##   --bfile temp1_cohort_split_ichip7
     ##   --make-bed
-    ##   --out temp2_eur_cohort_split_ichip7
+    ##   --out temp2_cohort_split_ichip7
     ##   --remove fail-IBD-QC.tsv
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
     ## 247903 variants loaded from .bim file.
-    ## 576 people (273 males, 303 females) loaded from .fam.
-    ## --remove: 537 people remaining.
+    ## 654 people (313 males, 341 females) loaded from .fam.
+    ## --remove: 615 people remaining.
     ## Using 1 thread (no multithreaded calculations invoked).
-    ## Before main variant filters, 537 founders and 0 nonfounders present.
+    ## Before main variant filters, 615 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Warning: 10 het. haploid genotypes present (see
-    ## temp2_eur_cohort_split_ichip7.hh ); many commands treat these as missing.
+    ## Warning: 10 het. haploid genotypes present (see temp2_cohort_split_ichip7.hh );
+    ## many commands treat these as missing.
     ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
     ## treat these as missing.
-    ## Total genotyping rate in remaining samples is 0.999606.
-    ## 247903 variants and 537 people pass filters and QC.
+    ## Total genotyping rate in remaining samples is 0.999614.
+    ## 247903 variants and 615 people pass filters and QC.
     ## Note: No phenotypes present.
-    ## --make-bed to temp2_eur_cohort_split_ichip7.bed +
-    ## temp2_eur_cohort_split_ichip7.bim + temp2_eur_cohort_split_ichip7.fam ... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
+    ## --make-bed to temp2_cohort_split_ichip7.bed + temp2_cohort_split_ichip7.bim +
+    ## temp2_cohort_split_ichip7.fam ... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
 
-576 people to 537 people. 39 duplicates removed.
+654 people to 615 people. 39 duplicates removed.
 
 ### Failed SNPs missingness &gt;97% and MAF 1%, and HWE 10^-6, Sample missingnes 3%
 
 ``` bash
 plink \
---bfile temp2_eur_cohort_split_ichip7 \
+--bfile temp2_cohort_split_ichip7 \
 --geno 0.03 \
 --maf 0.01 \
 --hwe 0.000001 \
 --mind 0.03 \
 --make-bed \
---out temp3_eur_cohort_split_ichip7 
+--out temp3_cohort_split_ichip7 
 ```
 
     ## PLINK v1.90b5.4 64-bit (10 Apr 2018)           www.cog-genomics.org/plink/1.9/
     ## (C) 2005-2018 Shaun Purcell, Christopher Chang   GNU General Public License v3
-    ## Logging to temp3_eur_cohort_split_ichip7.log.
+    ## Logging to temp3_cohort_split_ichip7.log.
     ## Options in effect:
-    ##   --bfile temp2_eur_cohort_split_ichip7
+    ##   --bfile temp2_cohort_split_ichip7
     ##   --geno 0.03
     ##   --hwe 0.000001
     ##   --maf 0.01
     ##   --make-bed
     ##   --mind 0.03
-    ##   --out temp3_eur_cohort_split_ichip7
+    ##   --out temp3_cohort_split_ichip7
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
     ## 247903 variants loaded from .bim file.
-    ## 537 people (271 males, 266 females) loaded from .fam.
+    ## 615 people (311 males, 304 females) loaded from .fam.
     ## 0 people removed due to missing genotype data (--mind).
     ## Using 1 thread (no multithreaded calculations invoked).
-    ## Before main variant filters, 537 founders and 0 nonfounders present.
+    ## Before main variant filters, 615 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Warning: 10 het. haploid genotypes present (see
-    ## temp3_eur_cohort_split_ichip7.hh ); many commands treat these as missing.
+    ## Warning: 10 het. haploid genotypes present (see temp3_cohort_split_ichip7.hh );
+    ## many commands treat these as missing.
     ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
     ## treat these as missing.
-    ## Total genotyping rate is 0.999606.
+    ## Total genotyping rate is 0.999614.
     ## 19 variants removed due to missing genotype data (--geno).
     ## Warning: --hwe observation counts vary by more than 10%, due to the X
     ## chromosome.  You may want to use a less stringent --hwe p-value threshold for X
     ## chromosome variants.
-    ## --hwe: 12 variants removed due to Hardy-Weinberg exact test.
-    ## 35747 variants removed due to minor allele threshold(s)
+    ## --hwe: 142 variants removed due to Hardy-Weinberg exact test.
+    ## 34018 variants removed due to minor allele threshold(s)
     ## (--maf/--max-maf/--mac/--max-mac).
-    ## 212125 variants and 537 people pass filters and QC.
+    ## 213724 variants and 615 people pass filters and QC.
     ## Note: No phenotypes present.
-    ## --make-bed to temp3_eur_cohort_split_ichip7.bed +
-    ## temp3_eur_cohort_split_ichip7.bim + temp3_eur_cohort_split_ichip7.fam ... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
+    ## --make-bed to temp3_cohort_split_ichip7.bed + temp3_cohort_split_ichip7.bim +
+    ## temp3_cohort_split_ichip7.fam ... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
 
-19 variants removed due to missing genotype data (--geno). 12 variants removed due to Hardy-Weinberg exact test (--hwe) 35747 variants removed due to minor allele threshold(s)(--maf) 0 people removed due to missing genotype data (--mind)
+19 variants removed due to missing genotype data (--geno). 142 variants removed due to Hardy-Weinberg exact test (--hwe) 34018 variants removed due to minor allele threshold(s)(--maf) 0 people removed due to missing genotype data (--mind)
 
 ### Remove samples that fail het check
 
 ``` bash
 plink \
---bfile temp3_eur_cohort_split_ichip7 \
+--bfile temp3_cohort_split_ichip7 \
 --remove fail-het-outlier.txt \
 --make-bed \
---out qc_eur_cohort_split_ichip7
+--out qc_all_cohort_split_ichip7
 ```
 
     ## PLINK v1.90b5.4 64-bit (10 Apr 2018)           www.cog-genomics.org/plink/1.9/
     ## (C) 2005-2018 Shaun Purcell, Christopher Chang   GNU General Public License v3
-    ## Logging to qc_eur_cohort_split_ichip7.log.
+    ## Logging to qc_all_cohort_split_ichip7.log.
     ## Options in effect:
-    ##   --bfile temp3_eur_cohort_split_ichip7
+    ##   --bfile temp3_cohort_split_ichip7
     ##   --make-bed
-    ##   --out qc_eur_cohort_split_ichip7
+    ##   --out qc_all_cohort_split_ichip7
     ##   --remove fail-het-outlier.txt
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 212125 variants loaded from .bim file.
-    ## 537 people (271 males, 266 females) loaded from .fam.
-    ## --remove: 531 people remaining.
+    ## 213724 variants loaded from .bim file.
+    ## 615 people (311 males, 304 females) loaded from .fam.
+    ## --remove: 597 people remaining.
     ## Using 1 thread (no multithreaded calculations invoked).
-    ## Before main variant filters, 531 founders and 0 nonfounders present.
+    ## Before main variant filters, 597 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Warning: 10 het. haploid genotypes present (see qc_eur_cohort_split_ichip7.hh
-    ## ); many commands treat these as missing.
+    ## Warning: 6 het. haploid genotypes present (see qc_all_cohort_split_ichip7.hh );
+    ## many commands treat these as missing.
     ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
     ## treat these as missing.
-    ## Total genotyping rate in remaining samples is 0.999627.
-    ## 212125 variants and 531 people pass filters and QC.
+    ## Total genotyping rate in remaining samples is 0.999634.
+    ## 213724 variants and 597 people pass filters and QC.
     ## Note: No phenotypes present.
-    ## --make-bed to qc_eur_cohort_split_ichip7.bed + qc_eur_cohort_split_ichip7.bim +
-    ## qc_eur_cohort_split_ichip7.fam ... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
+    ## --make-bed to qc_all_cohort_split_ichip7.bed + qc_all_cohort_split_ichip7.bim +
+    ## qc_all_cohort_split_ichip7.fam ... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
 
-537 people to 531 people. 6 samples as ientified.
+615 people to 597 people. 18 samples as ientified (of 19, one already removed)
 
 Part 3 Re-Check File Post QC
 ============================
@@ -764,91 +786,91 @@ Recheck Missingess and Sex with Cleaned File
 
 ``` bash
 plink \
---bfile qc_eur_cohort_split_ichip7 \
+--bfile qc_all_cohort_split_ichip7 \
 --missing \
---out qc_eur_cohort_split_ichip7
+--out qc_all_cohort_split_ichip7
 ```
 
     ## PLINK v1.90b5.4 64-bit (10 Apr 2018)           www.cog-genomics.org/plink/1.9/
     ## (C) 2005-2018 Shaun Purcell, Christopher Chang   GNU General Public License v3
-    ## Logging to qc_eur_cohort_split_ichip7.log.
+    ## Logging to qc_all_cohort_split_ichip7.log.
     ## Options in effect:
-    ##   --bfile qc_eur_cohort_split_ichip7
+    ##   --bfile qc_all_cohort_split_ichip7
     ##   --missing
-    ##   --out qc_eur_cohort_split_ichip7
+    ##   --out qc_all_cohort_split_ichip7
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 212125 variants loaded from .bim file.
-    ## 531 people (266 males, 265 females) loaded from .fam.
+    ## 213724 variants loaded from .bim file.
+    ## 597 people (304 males, 293 females) loaded from .fam.
     ## Using 1 thread (no multithreaded calculations invoked).
-    ## Before main variant filters, 531 founders and 0 nonfounders present.
+    ## Before main variant filters, 597 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Warning: 10 het. haploid genotypes present (see qc_eur_cohort_split_ichip7.hh
-    ## ); many commands treat these as missing.
+    ## Warning: 6 het. haploid genotypes present (see qc_all_cohort_split_ichip7.hh );
+    ## many commands treat these as missing.
     ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
     ## treat these as missing.
-    ## Total genotyping rate is 0.999627.
+    ## Total genotyping rate is 0.999634.
     ## --missing: Sample missing data report written to
-    ## qc_eur_cohort_split_ichip7.imiss, and variant-based missing data report written
-    ## to qc_eur_cohort_split_ichip7.lmiss.
+    ## qc_all_cohort_split_ichip7.imiss, and variant-based missing data report written
+    ## to qc_all_cohort_split_ichip7.lmiss.
 
 ``` r
-lmiss <- read_table("qc_eur_cohort_split_ichip7.lmiss")
+lmiss <- read_table("qc_all_cohort_split_ichip7.lmiss")
 lmiss %>%
   ggplot(aes(x = F_MISS)) +
   geom_histogram(bins = 10) +
   labs(title = "SNP Level Missingess after SNP level Filtering")
 ```
 
-![](ichip7_eur_qc_files/figure-markdown_github/unnamed-chunk-27-1.png)
+![](ichip7_all_qc_files/figure-markdown_github/unnamed-chunk-27-1.png)
 
 ``` r
-imiss <- read_table("qc_eur_cohort_split_ichip7.imiss")
+imiss <- read_table("qc_all_cohort_split_ichip7.imiss")
 imiss %>%
   ggplot(aes(x = F_MISS)) +
   geom_histogram(bins = 100) +
   labs(title = "Sample Level Missingess after Sample Level Filtering")
 ```
 
-![](ichip7_eur_qc_files/figure-markdown_github/unnamed-chunk-28-1.png) Batch effect resolved.
+![](ichip7_all_qc_files/figure-markdown_github/unnamed-chunk-28-1.png) Batch effect resolved.
 
 Re-Check Hets
 -------------
 
 ``` bash
 plink \
---bfile qc_eur_cohort_split_ichip7 \
+--bfile qc_all_cohort_split_ichip7 \
 --het \
---out qc_eur_cohort_split_ichip7
+--out qc_all_cohort_split_ichip7
 ```
 
     ## PLINK v1.90b5.4 64-bit (10 Apr 2018)           www.cog-genomics.org/plink/1.9/
     ## (C) 2005-2018 Shaun Purcell, Christopher Chang   GNU General Public License v3
-    ## Logging to qc_eur_cohort_split_ichip7.log.
+    ## Logging to qc_all_cohort_split_ichip7.log.
     ## Options in effect:
-    ##   --bfile qc_eur_cohort_split_ichip7
+    ##   --bfile qc_all_cohort_split_ichip7
     ##   --het
-    ##   --out qc_eur_cohort_split_ichip7
+    ##   --out qc_all_cohort_split_ichip7
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 212125 variants loaded from .bim file.
-    ## 531 people (266 males, 265 females) loaded from .fam.
+    ## 213724 variants loaded from .bim file.
+    ## 597 people (304 males, 293 females) loaded from .fam.
     ## Using 1 thread (no multithreaded calculations invoked).
-    ## Before main variant filters, 531 founders and 0 nonfounders present.
+    ## Before main variant filters, 597 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Warning: 10 het. haploid genotypes present (see qc_eur_cohort_split_ichip7.hh
-    ## ); many commands treat these as missing.
+    ## Warning: 6 het. haploid genotypes present (see qc_all_cohort_split_ichip7.hh );
+    ## many commands treat these as missing.
     ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
     ## treat these as missing.
-    ## Total genotyping rate is 0.999627.
-    ## 212125 variants and 531 people pass filters and QC.
+    ## Total genotyping rate is 0.999634.
+    ## 213724 variants and 597 people pass filters and QC.
     ## Note: No phenotypes present.
-    ## --het: 210901 variants scanned, report written to
-    ## qc_eur_cohort_split_ichip7.het .
+    ## --het: 212421 variants scanned, report written to
+    ## qc_all_cohort_split_ichip7.het .
 
 ``` r
-imiss <- read_table("qc_eur_cohort_split_ichip7.imiss")
-het <- read_table("qc_eur_cohort_split_ichip7.het") %>%
+imiss <- read_table("qc_all_cohort_split_ichip7.imiss")
+het <- read_table("qc_all_cohort_split_ichip7.het") %>%
   mutate(obs_het_rate = (`N(NM)` - `O(HOM)`)/`E(HOM)`)
 imiss_het <- left_join(imiss, het, by = "FID")
 
@@ -862,42 +884,42 @@ ggplot(imiss_het, aes(x = F_MISS, y = obs_het_rate)) +
   geom_hline(yintercept = (mean(imiss_het$obs_het_rate)-(3*sd(imiss_het$obs_het_rate))), color = "red")
 ```
 
-![](ichip7_eur_qc_files/figure-markdown_github/unnamed-chunk-30-1.png) Looks great.
+![](ichip7_all_qc_files/figure-markdown_github/unnamed-chunk-30-1.png) Looks great.
 
 Calculate Overall project MAF Adter Filtering
 ---------------------------------------------
 
 ``` bash
 plink \
---bfile qc_eur_cohort_split_ichip7 \
+--bfile qc_all_cohort_split_ichip7 \
 --freq \
---out qc_eur_cohort_split_ichip7
+--out qc_all_cohort_split_ichip7
 ```
 
     ## PLINK v1.90b5.4 64-bit (10 Apr 2018)           www.cog-genomics.org/plink/1.9/
     ## (C) 2005-2018 Shaun Purcell, Christopher Chang   GNU General Public License v3
-    ## Logging to qc_eur_cohort_split_ichip7.log.
+    ## Logging to qc_all_cohort_split_ichip7.log.
     ## Options in effect:
-    ##   --bfile qc_eur_cohort_split_ichip7
+    ##   --bfile qc_all_cohort_split_ichip7
     ##   --freq
-    ##   --out qc_eur_cohort_split_ichip7
+    ##   --out qc_all_cohort_split_ichip7
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 212125 variants loaded from .bim file.
-    ## 531 people (266 males, 265 females) loaded from .fam.
+    ## 213724 variants loaded from .bim file.
+    ## 597 people (304 males, 293 females) loaded from .fam.
     ## Using 1 thread (no multithreaded calculations invoked).
-    ## Before main variant filters, 531 founders and 0 nonfounders present.
+    ## Before main variant filters, 597 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Warning: 10 het. haploid genotypes present (see qc_eur_cohort_split_ichip7.hh
-    ## ); many commands treat these as missing.
+    ## Warning: 6 het. haploid genotypes present (see qc_all_cohort_split_ichip7.hh );
+    ## many commands treat these as missing.
     ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
     ## treat these as missing.
-    ## Total genotyping rate is 0.999627.
+    ## Total genotyping rate is 0.999634.
     ## --freq: Allele frequencies (founders only) written to
-    ## qc_eur_cohort_split_ichip7.frq .
+    ## qc_all_cohort_split_ichip7.frq .
 
 ``` r
-maffreq <- read_table2("qc_eur_cohort_split_ichip7.frq")
+maffreq <- read_table2("qc_all_cohort_split_ichip7.frq")
 maffreq %>%
   ggplot(aes(x = MAF)) +
   geom_histogram(aes(y =..density..)) +
@@ -905,7 +927,7 @@ maffreq %>%
   labs(title = "Overall MAF After Filtering")
 ```
 
-![](ichip7_eur_qc_files/figure-markdown_github/unnamed-chunk-32-1.png)
+![](ichip7_all_qc_files/figure-markdown_github/unnamed-chunk-32-1.png)
 
 Identification of Duplicated or Related Individuals
 ---------------------------------------------------
@@ -915,24 +937,24 @@ Identification of Duplicated or Related Individuals
 
 ``` bash
 plink \
---bfile qc_eur_cohort_split_ichip7 \
+--bfile qc_all_cohort_split_ichip7 \
 --exclude ../../original_data/highLDregions.txt \
 --range \
 --indep 50 5 1.8 \
---out qc_eur_cohort_split_ichip7 &>/dev/null
+--out qc_all_cohort_split_ichip7 &>/dev/null
 ```
 
 ``` bash
 plink \
---bfile qc_eur_cohort_split_ichip7 \
---extract qc_eur_cohort_split_ichip7.prune.in \
+--bfile qc_all_cohort_split_ichip7 \
+--extract qc_all_cohort_split_ichip7.prune.in \
 --genome \
 --min 0.12 \
---out qc_eur_cohort_split_ichip7 &>/dev/null
+--out qc_all_cohort_split_ichip7 &>/dev/null
 ```
 
 ``` r
-genome <- read_table2("qc_eur_cohort_split_ichip7.genome")
+genome <- read_table2("qc_all_cohort_split_ichip7.genome")
 
 genome <- genome %>%
   mutate(PI_HAT = as.double(PI_HAT)) %>%
@@ -949,7 +971,7 @@ genome %>%
        y = "Z1 the proportion of loci where the pair shares one allele") 
 ```
 
-![](ichip7_eur_qc_files/figure-markdown_github/unnamed-chunk-35-1.png)
+![](ichip7_all_qc_files/figure-markdown_github/unnamed-chunk-35-1.png)
 
 Replicates (purple) removed
 
@@ -960,13 +982,11 @@ genome %>%
   labs(title = "Distribution of PI_HAT for Related Individuals >0.12", x = "PI_HAT", y = "Count (non-unique)")
 ```
 
-![](ichip7_eur_qc_files/figure-markdown_github/unnamed-chunk-36-1.png)
+![](ichip7_all_qc_files/figure-markdown_github/unnamed-chunk-36-1.png)
 
 ``` r
 file.remove(list.files(pattern = "^temp", full.names = TRUE))
 ```
 
     ##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-    ## [15] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-    ## [29] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-    ## [43] TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+    ## [15] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE

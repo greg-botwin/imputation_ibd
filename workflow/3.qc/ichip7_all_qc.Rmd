@@ -1,5 +1,5 @@
 ---
-title: "iChip 7 European QC"
+title: "iChip 7 All Ancestry QC"
 author: "Translational Genomics Group"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: github_document
@@ -22,7 +22,7 @@ This document is broken down into three parts.
 - Part 3 Re-Checks genotype data post QC Changes
 
 ## Source Data
-European IBD IChip, Run 7, Illumina's TOP Allele Called, aligned to HG19.
+All Ancestry IBD IChip, Run 7, Illumina's TOP Allele Called, aligned to HG19.
 
 # Part 1 - Identify QC Issues
 ## Identification of individuals with discordant sex information WITH --geno and --maf filters
@@ -37,23 +37,23 @@ European IBD IChip, Run 7, Illumina's TOP Allele Called, aligned to HG19.
 
 ```{bash}
 plink \
---bfile ../2.estimate_ancestry/eur_cohort_split_ichip7 \
+--bfile ../1.split_cohorts/cohort_split_ichip7 \
 --geno 0.03 \
 --maf 0.05 \
 --check-sex .4 .8 \
---out temp_eur_cohort_split_ichip7
+--out temp_cohort_split_ichip7
 ```
 
-Using 788 Xchr variants to check sex; 38 problems detected
+Using 792 Xchr variants to check sex; 41 problems detected
 
 ```{r message=FALSE}
-sexcheck <- read_table2(file = "temp_eur_cohort_split_ichip7.sexcheck")
+sexcheck <- read_table2(file = "temp_cohort_split_ichip7.sexcheck")
 sexcheck %>%
   filter(STATUS == "PROBLEM") %>%
   kable(caption = "List of Individuals with Sex Check Problems")
 ```
 
-38 problems detected, but this is beause many control samples are blank for Sex. Not real problems. 4 actual sex problems. 
+41 problems detected, but this is beause many control samples are blank for Sex. Not real problems. 7 actual sex problems. 
 
 ```{r}
 sexcheck %>%
@@ -62,7 +62,7 @@ sexcheck %>%
   kable(caption = "Sex Problems with a Reported Sex in Ped")
 ```
 
-4 of 4 sex problems come from a reported PEDSEX of Female but an F > 0.4. 
+7 of 7 sex problems come from a reported PEDSEX of Female but an F > 0.4. 
 
 ```{r message=FALSE}
 sexcheck %>%
@@ -83,15 +83,15 @@ Plotting F from check-sex based on chrX heterozygosity rates (F<0.4, M>0.8 expec
 
 ```{bash}
 plink \
---bfile ../2.estimate_ancestry/eur_cohort_split_ichip7 \
+--bfile ../1.split_cohorts/cohort_split_ichip7 \
 --missing \
---out temp_eur_cohort_split_ichip7 
+--out temp_cohort_split_ichip7 
 ```
 
-Total genotyping rate is 0.999625.
+Total genotyping rate is 0.999632.
 
 ```{r message=FALSE, warning=FALSE}
-lmiss <- read_table("temp_eur_cohort_split_ichip7.lmiss")
+lmiss <- read_table("temp_cohort_split_ichip7.lmiss")
 lmiss %>%
   ggplot(aes(x = F_MISS)) +
   geom_density() +
@@ -101,7 +101,7 @@ lmiss %>%
 Low missingness across iChip7
 
 ```{r message=FALSE, warning=FALSE}
-imiss <- read_table("temp_eur_cohort_split_ichip7.imiss")
+imiss <- read_table("temp_cohort_split_ichip7.imiss")
 imiss %>%
   ggplot(aes(x = F_MISS)) +
   geom_histogram(bins = 100) +
@@ -128,13 +128,13 @@ No samples with > 3% missingness.
 
 ```{bash}
 plink \
---bfile ../2.estimate_ancestry/eur_cohort_split_ichip7 \
+--bfile ../1.split_cohorts/cohort_split_ichip7 \
 --het \
---out temp_eur_cohort_split_ichip7
+--out temp_cohort_split_ichip7
 ```
 
 ```{r message=FALSE, warning=FALSE}
-het <- read_table("temp_eur_cohort_split_ichip7.het") 
+het <- read_table("temp_cohort_split_ichip7.het") 
 het <- het %>%
   mutate(obs_het_rate = (`N(NM)` - `O(HOM)`)/`E(HOM)`)
 imiss_het <- left_join(imiss, het, by = "FID")
@@ -163,20 +163,20 @@ imiss_het %>%
   dplyr::select(FID, IID.x) %>%
   write_tsv("fail-het-outlier.txt", col_names = FALSE)
 ```
-1 samples failed het check at +/- 4SD, 6 +/1 3SD. Only use 4SD with > 1000 Samples.
+1 samples failed het check at +/- 4SD, 19 +/1 3SD. Only use 4SD with > 1000 Samples.
 
 
 ## Calculate Overall project MAF before Filtering
 
 ```{bash}
 plink \
---bfile ../2.estimate_ancestry/eur_cohort_split_ichip7 \
+--bfile ../1.split_cohorts/cohort_split_ichip7 \
 --freq \
---out temp_eur_cohort_split_ichip7
+--out temp_cohort_split_ichip7
 ```
 
 ```{r message=FALSE, warning=FALSE}
-maffreq <- read_table2("temp_eur_cohort_split_ichip7.frq")
+maffreq <- read_table2("temp_cohort_split_ichip7.frq")
 maffreq %>%
   ggplot(aes(x = MAF)) +
   geom_histogram(aes(y =..density..)) +
@@ -190,10 +190,10 @@ maffreq %>%
 
 ```{bash}
 plink \
---bfile ../2.estimate_ancestry/eur_cohort_split_ichip7 \
+--bfile ../1.split_cohorts/cohort_split_ichip7 \
 --exclude range ../../original_data/highLDregions.txt \
 --indep 50 5 1.8 \
---out temp_eur_cohort_split_ichip7 &>/dev/null
+--out temp_cohort_split_ichip7 &>/dev/null
 ```
 
 Pruning complete. 12368 variants excluded removed in high ld.  77285 of 121314  variants removed. I will keep only the prune.in snps for the subsequent analysis. 
@@ -206,15 +206,15 @@ Pruning complete. 12368 variants excluded removed in high ld.  77285 of 121314  
 
 ```{bash}
 plink \
---bfile ../2.estimate_ancestry/eur_cohort_split_ichip7 \
---extract temp_eur_cohort_split_ichip7.prune.in \
+--bfile ../1.split_cohorts/cohort_split_ichip7 \
+--extract temp_cohort_split_ichip7.prune.in \
 --genome \
 --min 0.12 \
---out temp_eur_cohort_split_ichip7 &>/dev/null
+--out temp_cohort_split_ichip7 &>/dev/null
 ```
 
 ```{r warning=FALSE, message=FALSE}
-genome <- read_table2("temp_eur_cohort_split_ichip7.genome")
+genome <- read_table2("temp_cohort_split_ichip7.genome")
 
 genome <- genome %>%
   mutate(PI_HAT = as.double(PI_HAT)) %>%
@@ -296,19 +296,19 @@ sexcheck %>%
   dplyr::select(FID, IID) %>%
   write_tsv(path = "fail-updated-sex-check.txt", col_names = FALSE)
 ```
-These are 3 female samples, that have out of range but quasi-reasonable F. I will remove. Disucssed with Talin.
+These are 7 female samples, that have out of range but quasi-reasonable F. I will remove. Disucssed with Talin.
 
 #### Update Sex in PLINK
 ```{bash}
 plink \
---bfile ../2.estimate_ancestry/eur_cohort_split_ichip7 \
+--bfile ../1.split_cohorts/cohort_split_ichip7 \
 --update-sex update-missing-sex.txt \
 --remove fail-updated-sex-check.txt \
 --make-bed \
---out temp1_eur_cohort_split_ichip7
+--out temp1_cohort_split_ichip7
 ```
 --update-sex: 34 people updated.
---Removed 4 samples. Went from  580 to 876 subjects. All F
+--Removed 7 samples. Went from  661 to 654 subjects. All F
 
 ### Exclude Samples with IBD > 0.8
 For the purposes of this QC, I want to identify all pairs of individuals with an IBD >=0.8 and then remove the individual in the pair with the lower genotyping rate. IN some cases, you will want to remove the individual with the lower genotyping rate dependent on the phenotype. The ID of the individuals with the lower genotype rate will be stored in ‘fail-IBD-QC.txt’ for subsequent removal.
@@ -355,39 +355,39 @@ duplicates_to_remove <- relateds %>%
 
 ```{bash}
 plink \
---bfile temp1_eur_cohort_split_ichip7 \
+--bfile temp1_cohort_split_ichip7 \
 --remove fail-IBD-QC.tsv \
 --make-bed \
---out temp2_eur_cohort_split_ichip7
+--out temp2_cohort_split_ichip7
 ```
-576 people to 537 people. 39 duplicates removed. 
+654 people to 615 people. 39 duplicates removed. 
 
 ### Failed SNPs missingness >97% and MAF 1%, and HWE 10^-6, Sample missingnes 3%
 
 ```{bash}
 plink \
---bfile temp2_eur_cohort_split_ichip7 \
+--bfile temp2_cohort_split_ichip7 \
 --geno 0.03 \
 --maf 0.01 \
 --hwe 0.000001 \
 --mind 0.03 \
 --make-bed \
---out temp3_eur_cohort_split_ichip7 
+--out temp3_cohort_split_ichip7 
 ```
 19 variants removed due to missing genotype data (--geno).
-12 variants removed due to Hardy-Weinberg exact test (--hwe)
-35747 variants removed due to minor allele threshold(s)(--maf)
+142 variants removed due to Hardy-Weinberg exact test (--hwe)
+34018 variants removed due to minor allele threshold(s)(--maf)
 0 people removed due to missing genotype data (--mind)
 
 ### Remove samples that fail het check
 ```{bash}
 plink \
---bfile temp3_eur_cohort_split_ichip7 \
+--bfile temp3_cohort_split_ichip7 \
 --remove fail-het-outlier.txt \
 --make-bed \
---out qc_eur_cohort_split_ichip7
+--out qc_all_cohort_split_ichip7
 ```
-537 people to 531 people. 6 samples as ientified. 
+615 people to 597 people. 18 samples as ientified (of 19, one already removed)
 
 
 # Part 3 Re-Check File Post QC
@@ -395,13 +395,13 @@ plink \
 
 ```{bash}
 plink \
---bfile qc_eur_cohort_split_ichip7 \
+--bfile qc_all_cohort_split_ichip7 \
 --missing \
---out qc_eur_cohort_split_ichip7
+--out qc_all_cohort_split_ichip7
 ```
 
 ```{r message=FALSE, warning=FALSE}
-lmiss <- read_table("qc_eur_cohort_split_ichip7.lmiss")
+lmiss <- read_table("qc_all_cohort_split_ichip7.lmiss")
 lmiss %>%
   ggplot(aes(x = F_MISS)) +
   geom_histogram(bins = 10) +
@@ -409,7 +409,7 @@ lmiss %>%
 ```
 
 ```{r message=FALSE, warning=FALSE}
-imiss <- read_table("qc_eur_cohort_split_ichip7.imiss")
+imiss <- read_table("qc_all_cohort_split_ichip7.imiss")
 imiss %>%
   ggplot(aes(x = F_MISS)) +
   geom_histogram(bins = 100) +
@@ -420,14 +420,14 @@ Batch effect resolved.
 ## Re-Check Hets
 ```{bash}
 plink \
---bfile qc_eur_cohort_split_ichip7 \
+--bfile qc_all_cohort_split_ichip7 \
 --het \
---out qc_eur_cohort_split_ichip7
+--out qc_all_cohort_split_ichip7
 ```
 
 ```{r message=FALSE, warning=FALSE}
-imiss <- read_table("qc_eur_cohort_split_ichip7.imiss")
-het <- read_table("qc_eur_cohort_split_ichip7.het") %>%
+imiss <- read_table("qc_all_cohort_split_ichip7.imiss")
+het <- read_table("qc_all_cohort_split_ichip7.het") %>%
   mutate(obs_het_rate = (`N(NM)` - `O(HOM)`)/`E(HOM)`)
 imiss_het <- left_join(imiss, het, by = "FID")
 
@@ -446,13 +446,13 @@ Looks great.
 
 ```{bash}
 plink \
---bfile qc_eur_cohort_split_ichip7 \
+--bfile qc_all_cohort_split_ichip7 \
 --freq \
---out qc_eur_cohort_split_ichip7
+--out qc_all_cohort_split_ichip7
 ```
 
 ```{r message=FALSE, warning=FALSE}
-maffreq <- read_table2("qc_eur_cohort_split_ichip7.frq")
+maffreq <- read_table2("qc_all_cohort_split_ichip7.frq")
 maffreq %>%
   ggplot(aes(x = MAF)) +
   geom_histogram(aes(y =..density..)) +
@@ -466,25 +466,25 @@ maffreq %>%
 
 ```{bash}
 plink \
---bfile qc_eur_cohort_split_ichip7 \
+--bfile qc_all_cohort_split_ichip7 \
 --exclude ../../original_data/highLDregions.txt \
 --range \
 --indep 50 5 1.8 \
---out qc_eur_cohort_split_ichip7 &>/dev/null
+--out qc_all_cohort_split_ichip7 &>/dev/null
 ```
 
 
 ```{bash}
 plink \
---bfile qc_eur_cohort_split_ichip7 \
---extract qc_eur_cohort_split_ichip7.prune.in \
+--bfile qc_all_cohort_split_ichip7 \
+--extract qc_all_cohort_split_ichip7.prune.in \
 --genome \
 --min 0.12 \
---out qc_eur_cohort_split_ichip7 &>/dev/null
+--out qc_all_cohort_split_ichip7 &>/dev/null
 ```
 
 ```{r warning=FALSE, message=FALSE}
-genome <- read_table2("qc_eur_cohort_split_ichip7.genome")
+genome <- read_table2("qc_all_cohort_split_ichip7.genome")
 
 genome <- genome %>%
   mutate(PI_HAT = as.double(PI_HAT)) %>%
