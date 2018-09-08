@@ -71,37 +71,42 @@ Using 593 Xchr variants to check sex; 4 problems detected
 sexcheck <- read_table2(file = "temp_eur_cohort_split_ichip1t6.sexcheck")
 sexcheck %>%
   filter(STATUS == "PROBLEM") %>%
-  datatable(caption = "List of Individuals with Sex Check Problems")
+  kable(caption = "List of Individuals with Sex Check Problems")
 ```
 
-<!--html_preserve-->
+| FID     |  IID|  PEDSEX|  SNPSEX| STATUS  |       F|
+|:--------|----:|-------:|-------:|:--------|-------:|
+| 0201354 |   11|       2|       0| PROBLEM |  0.4217|
+| 0201478 |   11|       2|       0| PROBLEM |  0.4110|
+| 1101662 |   11|       0|       1| PROBLEM |  1.0000|
+| 1400397 |    1|       2|       0| PROBLEM |  0.4265|
 
-<script type="application/json" data-for="htmlwidget-f6900d08755c9e6e3f21">{"x":{"filter":"none","caption":"<caption>List of Individuals with Sex Check Problems<\/caption>","data":[["1","2","3","4"],["0201354","0201478","1101662","1400397"],[11,11,11,1],[2,2,0,2],[0,0,1,0],["PROBLEM","PROBLEM","PROBLEM","PROBLEM"],[0.4217,0.411,1,0.4265]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>FID<\/th>\n      <th>IID<\/th>\n      <th>PEDSEX<\/th>\n      <th>SNPSEX<\/th>\n      <th>STATUS<\/th>\n      <th>F<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3,4,6]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
-<!--/html_preserve-->
 ``` r
 sexcheck %>%
   filter(STATUS == "PROBLEM") %>%
   filter(PEDSEX != 0) %>%
-  datatable(caption = "Sex Problems with a Reported Sex in Ped")
+  kable(caption = "Sex Problems with a Reported Sex in Ped")
 ```
 
-<!--html_preserve-->
+| FID     |  IID|  PEDSEX|  SNPSEX| STATUS  |       F|
+|:--------|----:|-------:|-------:|:--------|-------:|
+| 0201354 |   11|       2|       0| PROBLEM |  0.4217|
+| 0201478 |   11|       2|       0| PROBLEM |  0.4110|
+| 1400397 |    1|       2|       0| PROBLEM |  0.4265|
 
-<script type="application/json" data-for="htmlwidget-757a0fb9f448d8f76eac">{"x":{"filter":"none","caption":"<caption>Sex Problems with a Reported Sex in Ped<\/caption>","data":[["1","2","3"],["0201354","0201478","1400397"],[11,11,1],[2,2,2],[0,0,0],["PROBLEM","PROBLEM","PROBLEM"],[0.4217,0.411,0.4265]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>FID<\/th>\n      <th>IID<\/th>\n      <th>PEDSEX<\/th>\n      <th>SNPSEX<\/th>\n      <th>STATUS<\/th>\n      <th>F<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3,4,6]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
-<!--/html_preserve-->
 3 of 4 sex problems come from a reported PEDSEX of Female but an F &gt; 0.4.
 
 ``` r
 sexcheck %>%
   filter(STATUS == "PROBLEM") %>%
   filter(PEDSEX == 0) %>%
-  datatable(caption = "Sex Probelms without Sex Recorded in Ped")
+  kable(caption = "Sex Probelms without Sex Recorded in Ped")
 ```
 
-<!--html_preserve-->
+| FID     |  IID|  PEDSEX|  SNPSEX| STATUS  |    F|
+|:--------|----:|-------:|-------:|:--------|----:|
+| 1101662 |   11|       0|       1| PROBLEM |    1|
 
-<script type="application/json" data-for="htmlwidget-f7a764127cad0912841f">{"x":{"filter":"none","caption":"<caption>Sex Probelms without Sex Recorded in Ped<\/caption>","data":[["1"],["1101662"],[11],[0],[1],["PROBLEM"],[1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>FID<\/th>\n      <th>IID<\/th>\n      <th>PEDSEX<\/th>\n      <th>SNPSEX<\/th>\n      <th>STATUS<\/th>\n      <th>F<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3,4,6]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
-<!--/html_preserve-->
 The remaining 1 problem comes from a sample without a reported PEDSEX, but is classified as Male.
 
 ``` r
@@ -257,13 +262,21 @@ ggplot(imiss_het, aes(x = F_MISS, y = obs_het_rate)) +
 imiss_het %>%
   filter(obs_het_rate >= (mean(imiss_het$obs_het_rate)+(4*sd(imiss_het$obs_het_rate))) |
            obs_het_rate <= (mean(imiss_het$obs_het_rate)-(4*sd(imiss_het$obs_het_rate)))) %>%
-  datatable(caption = "Samples That Fail Het Check")
+  kable(caption = "Samples That Fail Het Check")
 ```
 
-<!--html_preserve-->
+| FID     |  IID.x| MISS\_PHENO |  N\_MISS|  N\_GENO|    F\_MISS|  IID.y|  O(HOM)|  E(HOM)|   N(NM)|       F|  obs\_het\_rate|
+|:--------|------:|:------------|--------:|--------:|----------:|------:|-------:|-------:|-------:|-------:|---------------:|
+| 0401750 |      1| Y           |       18|   133250|  0.0001351|      1|  103637|   99080|  132253|  0.1374|       0.2888171|
+| 0602960 |      1| Y           |        5|   133250|  0.0000375|      1|  104505|   99090|  132266|  0.1633|       0.2801595|
+| 1000903 |      1| Y           |       18|   133250|  0.0001351|      1|  103453|   99080|  132253|  0.1319|       0.2906742|
+| 1200345 |      1| Y           |      590|   133250|  0.0044280|      1|  103584|   98670|  131690|  0.1489|       0.2848485|
+| 1400426 |      1| Y           |       18|   133250|  0.0001351|      1|  103647|   99080|  132253|  0.1376|       0.2887162|
+| 8900681 |      1| Y           |       17|   133250|  0.0001276|      1|  106194|   99080|  132254|  0.2144|       0.2630198|
+| 9400654 |      1| Y           |       18|   133250|  0.0001351|      1|  103461|   99080|  132253|  0.1321|       0.2905935|
+| 9400692 |      1| Y           |       24|   133250|  0.0001801|      1|  103571|   99070|  132247|  0.1355|       0.2894519|
+| 9500385 |      1| Y           |      549|   133250|  0.0041200|      1|  103511|   98700|  131731|  0.1457|       0.2859169|
 
-<script type="application/json" data-for="htmlwidget-65ec214114405537ae64">{"x":{"filter":"none","caption":"<caption>Samples That Fail Het Check<\/caption>","data":[["1","2","3","4","5","6","7","8","9"],["0401750","0602960","1000903","1200345","1400426","8900681","9400654","9400692","9500385"],[1,1,1,1,1,1,1,1,1],["Y","Y","Y","Y","Y","Y","Y","Y","Y"],[18,5,18,590,18,17,18,24,549],[133250,133250,133250,133250,133250,133250,133250,133250,133250],[0.0001351,3.752e-05,0.0001351,0.004428,0.0001351,0.0001276,0.0001351,0.0001801,0.00412],[1,1,1,1,1,1,1,1,1],[103637,104505,103453,103584,103647,106194,103461,103571,103511],[99080,99090,99080,98670,99080,99080,99080,99070,98700],[132253,132266,132253,131690,132253,132254,132253,132247,131731],[0.1374,0.1633,0.1319,0.1489,0.1376,0.2144,0.1321,0.1355,0.1457],[0.288817117480824,0.280159451004138,0.290674202664514,0.284848484848485,0.288716188938232,0.263019781994348,0.29059345983044,0.289451902695064,0.285916919959473]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>FID<\/th>\n      <th>IID.x<\/th>\n      <th>MISS_PHENO<\/th>\n      <th>N_MISS<\/th>\n      <th>N_GENO<\/th>\n      <th>F_MISS<\/th>\n      <th>IID.y<\/th>\n      <th>O(HOM)<\/th>\n      <th>E(HOM)<\/th>\n      <th>N(NM)<\/th>\n      <th>F<\/th>\n      <th>obs_het_rate<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,4,5,6,7,8,9,10,11,12]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
-<!--/html_preserve-->
 ``` r
 imiss_het %>%
   filter(obs_het_rate >= (mean(imiss_het$obs_het_rate)+(4*sd(imiss_het$obs_het_rate))) |
@@ -434,13 +447,13 @@ sexcheck %>%
                           ifelse(F > 0.8, 1, PEDSEX))) %>% 
   filter(PEDSEX != 0) %>%
   dplyr::select(FID, IID, PEDSEX) %>%
-  datatable(caption = "Subjects to Update Sex")
+  kable(caption = "Subjects to Update Sex")
 ```
 
-<!--html_preserve-->
+| FID     |  IID|  PEDSEX|
+|:--------|----:|-------:|
+| 1101662 |   11|       1|
 
-<script type="application/json" data-for="htmlwidget-de8869c1d5e7f5c61b33">{"x":{"filter":"none","caption":"<caption>Subjects to Update Sex<\/caption>","data":[["1"],["1101662"],[11],[1]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>FID<\/th>\n      <th>IID<\/th>\n      <th>PEDSEX<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
-<!--/html_preserve-->
 #### Create List of Subjects that Fail Sex Check After Update
 
 ``` r
@@ -449,13 +462,15 @@ sexcheck %>%
            PEDSEX == 2 & SNPSEX == 1 |
            PEDSEX == 2 & SNPSEX == 0 & F > 0.4 |
            PEDSEX == 1 & SNPSEX == 0 & F < 0.8) %>%
-  datatable(caption = "Subjects that Fail Sex Check")
+  kable(caption = "Subjects that Fail Sex Check")
 ```
 
-<!--html_preserve-->
+| FID     |  IID|  PEDSEX|  SNPSEX| STATUS  |       F|
+|:--------|----:|-------:|-------:|:--------|-------:|
+| 0201354 |   11|       2|       0| PROBLEM |  0.4217|
+| 0201478 |   11|       2|       0| PROBLEM |  0.4110|
+| 1400397 |    1|       2|       0| PROBLEM |  0.4265|
 
-<script type="application/json" data-for="htmlwidget-51c35f6e596651852c98">{"x":{"filter":"none","caption":"<caption>Subjects that Fail Sex Check<\/caption>","data":[["1","2","3"],["0201354","0201478","1400397"],[11,11,1],[2,2,2],[0,0,0],["PROBLEM","PROBLEM","PROBLEM"],[0.4217,0.411,0.4265]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>FID<\/th>\n      <th>IID<\/th>\n      <th>PEDSEX<\/th>\n      <th>SNPSEX<\/th>\n      <th>STATUS<\/th>\n      <th>F<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3,4,6]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
-<!--/html_preserve-->
 ``` r
 sexcheck %>%
   filter(PEDSEX == 1 & SNPSEX == 2 |

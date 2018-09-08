@@ -3,7 +3,6 @@ title: "iChip 1 through 6 European QC"
 author: "Translational Genomics Group"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: github_document
-always_allow_html: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -51,14 +50,14 @@ Using 593 Xchr variants to check sex; 4 problems detected
 sexcheck <- read_table2(file = "temp_eur_cohort_split_ichip1t6.sexcheck")
 sexcheck %>%
   filter(STATUS == "PROBLEM") %>%
-  datatable(caption = "List of Individuals with Sex Check Problems")
+  kable(caption = "List of Individuals with Sex Check Problems")
 ```
 
 ```{r}
 sexcheck %>%
   filter(STATUS == "PROBLEM") %>%
   filter(PEDSEX != 0) %>%
-  datatable(caption = "Sex Problems with a Reported Sex in Ped")
+  kable(caption = "Sex Problems with a Reported Sex in Ped")
 ```
 
 3 of 4 sex problems come from a reported PEDSEX of Female but an F > 0.4. 
@@ -67,7 +66,7 @@ sexcheck %>%
 sexcheck %>%
   filter(STATUS == "PROBLEM") %>%
   filter(PEDSEX == 0) %>%
-  datatable(caption = "Sex Probelms without Sex Recorded in Ped")
+  kable(caption = "Sex Probelms without Sex Recorded in Ped")
 ```
 
 The remaining 1 problem comes from a sample without a reported PEDSEX, but is classified as Male.
@@ -163,7 +162,7 @@ ggplot(imiss_het, aes(x = F_MISS, y = obs_het_rate)) +
 imiss_het %>%
   filter(obs_het_rate >= (mean(imiss_het$obs_het_rate)+(4*sd(imiss_het$obs_het_rate))) |
            obs_het_rate <= (mean(imiss_het$obs_het_rate)-(4*sd(imiss_het$obs_het_rate)))) %>%
-  datatable(caption = "Samples That Fail Het Check")
+  kable(caption = "Samples That Fail Het Check")
 
 imiss_het %>%
   filter(obs_het_rate >= (mean(imiss_het$obs_het_rate)+(4*sd(imiss_het$obs_het_rate))) |
@@ -283,7 +282,7 @@ sexcheck %>%
                           ifelse(F > 0.8, 1, PEDSEX))) %>% 
   filter(PEDSEX != 0) %>%
   dplyr::select(FID, IID, PEDSEX) %>%
-  datatable(caption = "Subjects to Update Sex")
+  kable(caption = "Subjects to Update Sex")
 
 ```
 
@@ -294,7 +293,7 @@ sexcheck %>%
            PEDSEX == 2 & SNPSEX == 1 |
            PEDSEX == 2 & SNPSEX == 0 & F > 0.4 |
            PEDSEX == 1 & SNPSEX == 0 & F < 0.8) %>%
-  datatable(caption = "Subjects that Fail Sex Check")
+  kable(caption = "Subjects that Fail Sex Check")
 
 sexcheck %>%
   filter(PEDSEX == 1 & SNPSEX == 2 |
