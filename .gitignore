@@ -26,3 +26,7 @@ workflow/2.estimate_ancestry/ichip7_1000G_markers/
 *.lmiss
 *.hh
 *.sh
+*.genome
+*.het
+*.prune.in
+*.prune.out

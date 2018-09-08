@@ -120,6 +120,7 @@ fam %>%
 plink \
 --bfile temp_2 \
 --geno 0.99 \
+--extract ../../original_data/snpsincommon_proper_id.tsv \
 --keep-fam temp_ichip1t6_samples.tsv \
 --make-bed \
 --out cohort_split_ichip1t6

@@ -1,7 +1,7 @@
 Estimating Ethnicity in the iChip 7 Dataset
 ================
 Translational Genomics Group
-05 September, 2018
+07 September, 2018
 
 2. Preapre iChip 7 Dataset
 --------------------------
@@ -58,15 +58,19 @@ plink \
     ##   --out temp_ichip7
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 268093 variants loaded from .bim file.
+    ## 247903 variants loaded from .bim file.
     ## 661 people (313 males, 314 females, 34 ambiguous) loaded from .fam.
     ## Ambiguous sex IDs written to temp_ichip7.nosex .
-    ## --flip: 122854 SNPs flipped, 3139 SNP IDs not present.
+    ## --flip: 123774 SNPs flipped, 2219 SNP IDs not present.
     ## Using 1 thread (no multithreaded calculations invoked).
     ## Before main variant filters, 661 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Total genotyping rate is 0.914994.
-    ## 268093 variants and 661 people pass filters and QC.
+    ## Warning: 10 het. haploid genotypes present (see temp_ichip7.hh ); many commands
+    ## treat these as missing.
+    ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
+    ## treat these as missing.
+    ## Total genotyping rate is 0.999632.
+    ## 247903 variants and 661 people pass filters and QC.
     ## Note: No phenotypes present.
     ## --make-bed to temp_ichip7.bed + temp_ichip7.bim + temp_ichip7.fam ... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
 
@@ -90,15 +94,19 @@ plink \
     ##   --out temp2_ichip7
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 268093 variants loaded from .bim file.
+    ## 247903 variants loaded from .bim file.
     ## 661 people (313 males, 314 females, 34 ambiguous) loaded from .fam.
     ## Ambiguous sex IDs written to temp2_ichip7.nosex .
     ## Using 1 thread (no multithreaded calculations invoked).
     ## Before main variant filters, 661 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Total genotyping rate is 0.914994.
-    ## --a1-allele: 240891 assignments made.
-    ## 268093 variants and 661 people pass filters and QC.
+    ## Warning: 10 het. haploid genotypes present (see temp2_ichip7.hh ); many
+    ## commands treat these as missing.
+    ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
+    ## treat these as missing.
+    ## Total genotyping rate is 0.999632.
+    ## --a1-allele: 242616 assignments made.
+    ## 247903 variants and 661 people pass filters and QC.
     ## Note: No phenotypes present.
     ## --make-bed to temp2_ichip7.bed + temp2_ichip7.bim + temp2_ichip7.fam ... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
 
@@ -124,6 +132,7 @@ plink \
 --geno 0.03 \
 --maf 0.01 \
 --hwe 0.000001 \
+--chr 1-22 \
 --keep-allele-order \
 --make-bed \
 --out temp3_ichip7
@@ -134,6 +143,7 @@ plink \
     ## Logging to temp3_ichip7.log.
     ## Options in effect:
     ##   --bfile temp2_ichip7
+    ##   --chr 1-22
     ##   --geno 0.03
     ##   --hwe 0.000001
     ##   --keep-allele-order
@@ -142,14 +152,14 @@ plink \
     ##   --out temp3_ichip7
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 268093 variants loaded from .bim file.
+    ## 245393 out of 247903 variants loaded from .bim file.
     ## 661 people (313 males, 314 females, 34 ambiguous) loaded from .fam.
     ## Ambiguous sex IDs written to temp3_ichip7.nosex .
     ## Using 1 thread (no multithreaded calculations invoked).
     ## Before main variant filters, 661 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Total genotyping rate is 0.914994.
-    ## 22716 variants removed due to missing genotype data (--geno).
+    ## Total genotyping rate is 0.999635.
+    ## 16 variants removed due to missing genotype data (--geno).
     ## --hwe: 1515 variants removed due to Hardy-Weinberg exact test.
     ## 33365 variants removed due to minor allele threshold(s)
     ## (--maf/--max-maf/--mac/--max-mac).
@@ -221,7 +231,7 @@ plink2 \
     ##   --out temp4_ichip7
     ##   --set-all-var-ids @:#[hg19]
     ## 
-    ## Start time: Wed Sep  5 09:43:42 2018
+    ## Start time: Fri Sep  7 12:25:58 2018
     ## Note: --keep-allele-order no longer has any effect.
     ## 128908 MiB RAM detected; reserving 64454 MiB for main workspace.
     ## Using up to 48 threads (change this with --threads).
@@ -234,7 +244,7 @@ plink2 \
     ## Writing temp4_ichip7.bed ... 0%31%62%93%done.
     ## Writing temp4_ichip7.bim ... done.
     ## Writing temp4_ichip7.fam ... done.
-    ## End time: Wed Sep  5 09:43:42 2018
+    ## End time: Fri Sep  7 12:25:58 2018
 
 Process 1000 Genomes Data
 -------------------------
@@ -666,15 +676,19 @@ plink \
     ##   --out eur_cohort_split_ichip7
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 268093 variants loaded from .bim file.
+    ## 247903 variants loaded from .bim file.
     ## 661 people (313 males, 314 females, 34 ambiguous) loaded from .fam.
     ## Ambiguous sex IDs written to eur_cohort_split_ichip7.nosex .
     ## --keep: 580 people remaining.
     ## Using 1 thread (no multithreaded calculations invoked).
     ## Before main variant filters, 580 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Total genotyping rate in remaining samples is 0.914988.
-    ## 268093 variants and 580 people pass filters and QC.
+    ## Warning: 10 het. haploid genotypes present (see eur_cohort_split_ichip7.hh );
+    ## many commands treat these as missing.
+    ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
+    ## treat these as missing.
+    ## Total genotyping rate in remaining samples is 0.999625.
+    ## 247903 variants and 580 people pass filters and QC.
     ## Note: No phenotypes present.
     ## --make-bed to eur_cohort_split_ichip7.bed + eur_cohort_split_ichip7.bim +
     ## eur_cohort_split_ichip7.fam ... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
@@ -689,4 +703,4 @@ file.remove(list.files(pattern = "^temp", full.names = TRUE))
     ##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
     ## [15] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
     ## [29] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-    ## [43] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+    ## [43] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE

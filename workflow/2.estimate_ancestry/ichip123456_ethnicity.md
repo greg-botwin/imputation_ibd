@@ -65,19 +65,17 @@ plink \
     ##   --out temp_ichip1t6
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 178994 variants loaded from .bim file.
+    ## 133250 variants loaded from .bim file.
     ## 9971 people (4912 males, 5054 females, 5 ambiguous) loaded from .fam.
     ## Ambiguous sex IDs written to temp_ichip1t6.nosex .
-    ## --flip: 89303 SNPs flipped, 8390 SNP IDs not present.
+    ## --flip: 66791 SNPs flipped, 30902 SNP IDs not present.
     ## Using 1 thread (no multithreaded calculations invoked).
     ## Before main variant filters, 9971 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Warning: 9917 het. haploid genotypes present (see temp_ichip1t6.hh ); many
+    ## Warning: 48 het. haploid genotypes present (see temp_ichip1t6.hh ); many
     ## commands treat these as missing.
-    ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
-    ## treat these as missing.
-    ## Total genotyping rate is 0.846568.
-    ## 178994 variants and 9971 people pass filters and QC.
+    ## Total genotyping rate is 0.998891.
+    ## 133250 variants and 9971 people pass filters and QC.
     ## Note: No phenotypes present.
     ## --make-bed to temp_ichip1t6.bed + temp_ichip1t6.bim + temp_ichip1t6.fam ...
     ## 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
@@ -102,19 +100,17 @@ plink \
     ##   --out temp2_ichip1t6
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 178994 variants loaded from .bim file.
+    ## 133250 variants loaded from .bim file.
     ## 9971 people (4912 males, 5054 females, 5 ambiguous) loaded from .fam.
     ## Ambiguous sex IDs written to temp2_ichip1t6.nosex .
     ## Using 1 thread (no multithreaded calculations invoked).
     ## Before main variant filters, 9971 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Warning: 9917 het. haploid genotypes present (see temp2_ichip1t6.hh ); many
+    ## Warning: 48 het. haploid genotypes present (see temp2_ichip1t6.hh ); many
     ## commands treat these as missing.
-    ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
-    ## treat these as missing.
-    ## Total genotyping rate is 0.846568.
-    ## --a1-allele: 177036 assignments made.
-    ## 178994 variants and 9971 people pass filters and QC.
+    ## Total genotyping rate is 0.998891.
+    ## --a1-allele: 131960 assignments made.
+    ## 133250 variants and 9971 people pass filters and QC.
     ## Note: No phenotypes present.
     ## --make-bed to temp2_ichip1t6.bed + temp2_ichip1t6.bim + temp2_ichip1t6.fam ...
     ## 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
@@ -161,18 +157,18 @@ plink \
     ##   --out temp3_ichip1t6
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 176440 out of 178994 variants loaded from .bim file.
+    ## 132405 out of 133250 variants loaded from .bim file.
     ## 9971 people (4912 males, 5054 females, 5 ambiguous) loaded from .fam.
     ## Ambiguous sex IDs written to temp3_ichip1t6.nosex .
     ## Using 1 thread (no multithreaded calculations invoked).
     ## Before main variant filters, 9971 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Total genotyping rate is 0.852082.
-    ## 44094 variants removed due to missing genotype data (--geno).
-    ## --hwe: 10364 variants removed due to Hardy-Weinberg exact test.
-    ## 15042 variants removed due to minor allele threshold(s)
+    ## Total genotyping rate is 0.998898.
+    ## 507 variants removed due to missing genotype data (--geno).
+    ## --hwe: 10328 variants removed due to Hardy-Weinberg exact test.
+    ## 15000 variants removed due to minor allele threshold(s)
     ## (--maf/--max-maf/--mac/--max-mac).
-    ## 106940 variants and 9971 people pass filters and QC.
+    ## 106570 variants and 9971 people pass filters and QC.
     ## Note: No phenotypes present.
     ## --make-bed to temp3_ichip1t6.bed + temp3_ichip1t6.bim + temp3_ichip1t6.fam ...
     ## 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
@@ -197,13 +193,13 @@ plink \
     ##   --out temp3_ichip1t6
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 106940 variants loaded from .bim file.
+    ## 106570 variants loaded from .bim file.
     ## 9971 people (4912 males, 5054 females, 5 ambiguous) loaded from .fam.
     ## Ambiguous sex IDs written to temp3_ichip1t6.nosex .
     ## Using 1 thread (no multithreaded calculations invoked).
     ## Before main variant filters, 9971 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Total genotyping rate is 0.999749.
+    ## Total genotyping rate is 0.999823.
     ## --freq: Allele frequencies (founders only) written to temp3_ichip1t6.frq .
 
 ### Run 1000G Checks
@@ -241,20 +237,20 @@ plink2 \
     ##   --out temp4_ichip1t6
     ##   --set-all-var-ids @:#[hg19]
     ## 
-    ## Start time: Fri Sep  7 08:26:36 2018
+    ## Start time: Fri Sep  7 16:43:50 2018
     ## Note: --keep-allele-order no longer has any effect.
     ## 128908 MiB RAM detected; reserving 64454 MiB for main workspace.
     ## Using up to 48 threads (change this with --threads).
     ## 9971 samples (5054 females, 4912 males, 5 ambiguous; 9971 founders) loaded from
     ## temp3_ichip1t6.fam.
-    ## 106940 variants loaded from temp3_ichip1t6.bim.
+    ## 106570 variants loaded from temp3_ichip1t6.bim.
     ## Note: No phenotype data present.
-    ## --exclude: 106940 variants remaining.
-    ## 106940 variants remaining after main filters.
+    ## --exclude: 106570 variants remaining.
+    ## 106570 variants remaining after main filters.
     ## Writing temp4_ichip1t6.bed ... 0%61%done.
     ## Writing temp4_ichip1t6.bim ... done.
     ## Writing temp4_ichip1t6.fam ... done.
-    ## End time: Fri Sep  7 08:26:38 2018
+    ## End time: Fri Sep  7 16:43:51 2018
 
 Process 1000 Genomes Data
 -------------------------
@@ -320,7 +316,7 @@ plink2 \
 --out temp_chrall_1000g_ichip_sites > /dev/null
 ```
 
-    ## Warning: 791 multiallelic variants skipped (not yet supported).
+    ## Warning: 783 multiallelic variants skipped (not yet supported).
 
 Merge iCHIP and 1000 Genomes
 ----------------------------
@@ -356,15 +352,15 @@ plink \
     ##   --out temp5_ichip1t6
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 106940 variants loaded from .bim file.
+    ## 106570 variants loaded from .bim file.
     ## 9971 people (4912 males, 5054 females, 5 ambiguous) loaded from .fam.
     ## Ambiguous sex IDs written to temp5_ichip1t6.nosex .
-    ## --exclude: 106769 variants remaining.
+    ## --exclude: 106402 variants remaining.
     ## Using 1 thread (no multithreaded calculations invoked).
     ## Before main variant filters, 9971 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Total genotyping rate is 0.99975.
-    ## 106769 variants and 9971 people pass filters and QC.
+    ## Total genotyping rate is 0.999823.
+    ## 106402 variants and 9971 people pass filters and QC.
     ## Note: No phenotypes present.
     ## --make-bed to temp5_ichip1t6.bed + temp5_ichip1t6.bim + temp5_ichip1t6.fam ...
     ## 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
@@ -391,14 +387,14 @@ plink \
     ##   --out temp1_chrall_1000g_ichip_sites
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 104875 variants loaded from .bim file.
+    ## 104531 variants loaded from .bim file.
     ## 1668 people (0 males, 0 females, 1668 ambiguous) loaded from .fam.
     ## Ambiguous sex IDs written to temp1_chrall_1000g_ichip_sites.nosex .
-    ## --exclude: 104701 variants remaining.
+    ## --exclude: 104360 variants remaining.
     ## Using 1 thread (no multithreaded calculations invoked).
     ## Before main variant filters, 1668 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## 104701 variants and 1668 people pass filters and QC.
+    ## 104360 variants and 1668 people pass filters and QC.
     ## Note: No phenotypes present.
     ## --make-bed to temp1_chrall_1000g_ichip_sites.bed +
     ## temp1_chrall_1000g_ichip_sites.bim + temp1_chrall_1000g_ichip_sites.fam ...
@@ -427,10 +423,10 @@ plink \
     ## 9971 people loaded from temp5_ichip1t6.fam.
     ## 1668 people to be merged from temp1_chrall_1000g_ichip_sites.fam.
     ## Of these, 1668 are new, while 0 are present in the base dataset.
-    ## 106194 markers loaded from temp5_ichip1t6.bim.
-    ## 104701 markers to be merged from temp1_chrall_1000g_ichip_sites.bim.
-    ## Of these, 0 are new, while 104701 are present in the base dataset.
-    ## Performing single-pass merge (11639 people, 106194 variants).
+    ## 105829 markers loaded from temp5_ichip1t6.bim.
+    ## 104360 markers to be merged from temp1_chrall_1000g_ichip_sites.bim.
+    ## Of these, 0 are new, while 104360 are present in the base dataset.
+    ## Performing single-pass merge (11639 people, 105829 variants).
     ## 
     Pass 1: fileset #1 complete.
                                                   
@@ -473,15 +469,15 @@ plink \
     ##   --out temp1_ichip_1000g_sites_merged
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 106194 variants loaded from .bim file.
+    ## 105829 variants loaded from .bim file.
     ## 11639 people (4912 males, 5054 females, 1673 ambiguous) loaded from .fam.
     ## Ambiguous sex IDs written to temp1_ichip_1000g_sites_merged.nosex .
-    ## --extract: 30135 variants remaining.
+    ## --extract: 30082 variants remaining.
     ## Using 1 thread (no multithreaded calculations invoked).
     ## Before main variant filters, 11639 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Total genotyping rate is 0.999812.
-    ## 30135 variants and 11639 people pass filters and QC.
+    ## Total genotyping rate is 0.99987.
+    ## 30082 variants and 11639 people pass filters and QC.
     ## Note: No phenotypes present.
     ## --make-bed to temp1_ichip_1000g_sites_merged.bed +
     ## temp1_ichip_1000g_sites_merged.bim + temp1_ichip_1000g_sites_merged.fam ...
@@ -543,9 +539,9 @@ merged_admix_pop <- merged_admix_pop %>%
                                     if_else(EAS >= 0.75, "EAS",
                                                     if_else(AFR >= 0.75, "AFR", "Mixed")))) %>%
   mutate(kmeans_class = if_else(kmeans_cluster == 1, "EUR",
-                                if_else(kmeans_cluster == 2, "Mixed",
+                                if_else(kmeans_cluster == 2, "AFR",
                                         if_else(kmeans_cluster == 3, "EAS",
-                                                if_else(kmeans_cluster == 4, "AFR", "wilson")))))
+                                                if_else(kmeans_cluster == 4, "Mixed", "wilson")))))
 
 merged_admix_pop %>%
   filter(Superpopulation.code == "-") %>%
@@ -556,10 +552,10 @@ merged_admix_pop %>%
 
 | cedars\_75\_class |     n|
 |:------------------|-----:|
-| AFR               |   159|
+| AFR               |   161|
 | EAS               |   192|
-| EUR               |  8294|
-| Mixed             |  1326|
+| EUR               |  8295|
+| Mixed             |  1323|
 
 ``` r
 merged_admix_pop %>%
@@ -571,10 +567,10 @@ merged_admix_pop %>%
 
 | kmeans\_class |     n|
 |:--------------|-----:|
-| AFR           |   229|
+| AFR           |   230|
 | EAS           |   224|
-| EUR           |  8302|
-| Mixed         |  1216|
+| EUR           |  8305|
+| Mixed         |  1212|
 
 ``` r
 merged_admix_pop %>%
@@ -687,19 +683,17 @@ plink \
     ##   --out eur_cohort_split_ichip1t6
     ## 
     ## 128908 MB RAM detected; reserving 64454 MB for main workspace.
-    ## 178994 variants loaded from .bim file.
+    ## 133250 variants loaded from .bim file.
     ## 9971 people (4912 males, 5054 females, 5 ambiguous) loaded from .fam.
     ## Ambiguous sex IDs written to eur_cohort_split_ichip1t6.nosex .
-    ## --keep: 8294 people remaining.
+    ## --keep: 8295 people remaining.
     ## Using 1 thread (no multithreaded calculations invoked).
-    ## Before main variant filters, 8294 founders and 0 nonfounders present.
+    ## Before main variant filters, 8295 founders and 0 nonfounders present.
     ## Calculating allele frequencies... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99% done.
-    ## Warning: 8920 het. haploid genotypes present (see eur_cohort_split_ichip1t6.hh
-    ## ); many commands treat these as missing.
-    ## Warning: Nonmissing nonmale Y chromosome genotype(s) present; many commands
-    ## treat these as missing.
-    ## Total genotyping rate in remaining samples is 0.843263.
-    ## 178994 variants and 8294 people pass filters and QC.
+    ## Warning: 44 het. haploid genotypes present (see eur_cohort_split_ichip1t6.hh );
+    ## many commands treat these as missing.
+    ## Total genotyping rate in remaining samples is 0.999198.
+    ## 133250 variants and 8295 people pass filters and QC.
     ## Note: No phenotypes present.
     ## --make-bed to eur_cohort_split_ichip1t6.bed + eur_cohort_split_ichip1t6.bim +
     ## eur_cohort_split_ichip1t6.fam ... 0%1%2%3%4%5%6%7%8%9%10%11%12%13%14%15%16%17%18%19%20%21%22%23%24%25%26%27%28%29%30%31%32%33%34%35%36%37%38%39%40%41%42%43%44%45%46%47%48%49%50%51%52%53%54%55%56%57%58%59%60%61%62%63%64%65%66%67%68%69%70%71%72%73%74%75%76%77%78%79%80%81%82%83%84%85%86%87%88%89%90%91%92%93%94%95%96%97%98%99%done.
@@ -714,5 +708,4 @@ file.remove(list.files(pattern = "^temp", full.names = TRUE))
     ##  [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
     ## [15] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
     ## [29] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-    ## [43] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-    ## [57] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+    ## [43] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
