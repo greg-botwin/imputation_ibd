@@ -1,0 +1,533 @@
+---
+title: "iChip 1 through 6 All Ancestry QC"
+author: "Translational Genomics Group"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+library(knitr)
+library(DT)
+library(ggplot2)
+library(readxl)
+library(stringr)
+```
+## Set-up
+This document is broken down into three parts. 
+- Part 1 Identifies QC issues
+- Part 2 Fixes and applies QC parameters
+- Part 3 Re-Checks genotype data post QC Changes
+
+## Source Data
+All Ancestry IChip, Runs 1-6, Illumina's TOP Allele Called, including GOLDR removed BBC, filtered to SNPS in common, and aligned to HG19.
+
+# Part 1 - Identify QC Issues
+## Identification of individuals with discordant sex information WITH --geno and --maf filters
+- Plink uses chrX data to determine sex (based on heterozygosity rates).  
+- Default PLINK thresholds of .2 for Females and .8 for Males when assessing homozygosity rates, but use .4 and .8.  
+- When the homozygosity rate is more than 0.4 but less than 0.8, the genotype data are inconclusive regarding the sex of an individual and these are marked in column 4 with a 0.
+- maf and geno filter added with check-sex run
+- PEDSEX=sex as recorded in pedfile (1=male, 2=female)  
+- SNPSEX=sex as predicted based on genetic data (1=male, 2=female, 0=unknown)
+- If needed, compare with GenomeStudio gender estimates to ID true problems
+- We suggest running --check-sex once without parameters, eyeballing the distribution of F estimates (there should be a clear gap between a very tight male clump at the right side of the distribution and the females everywhere else), and then rerunning with parameters corresponding to the empirical gap.
+
+```{bash}
+plink \
+--bfile ../1.split_cohorts/cohort_split_ichip1t6 \
+--geno 0.03 \
+--maf 0.05 \
+--check-sex .4 .8 \
+--out temp_all_cohort_split_ichip1t6
+```
+
+Using 599 Xchr variants to check sex; 18 problems detected
+
+```{r message=FALSE}
+sexcheck <- read_table2(file = "temp_all_cohort_split_ichip1t6.sexcheck")
+sexcheck %>%
+  filter(STATUS == "PROBLEM") %>%
+  kable(caption = "List of Individuals with Sex Check Problems")
+```
+
+```{r}
+sexcheck %>%
+  filter(STATUS == "PROBLEM") %>%
+  filter(PEDSEX != 0) %>%
+  kable(caption = "Sex Problems with a Reported Sex in Ped")
+```
+
+13 of 18 sex problems come from a reported PEDSEX of Female but an F > 0.4. 
+
+```{r}
+sexcheck %>%
+  filter(STATUS == "PROBLEM") %>%
+  filter(PEDSEX == 0) %>%
+  kable(caption = "Sex Probelms without Sex Recorded in Ped")
+```
+
+The remaining 5 problem comes from a sample without a reported PEDSEX, but are easily classified as Male or Female.
+
+```{r message=FALSE}
+sexcheck %>%
+  ggplot(aes(x = F)) +
+  geom_density() +
+  labs(title = "Heterozygoisty Rates for Samples Filtered with geno/maf included") 
+```
+
+Plotting F from check-sex based on chrX heterozygosity rates (F<0.4, M>0.8 expected). We can see that they nicely seperate as expected.
+
+## Identification of individuals with elevated missing data rates or outlying heterozygosity rate
+### Number of missing SNPS and Proportion of Missings SNPs per Individual
+- no filters included here
+- {output.imiss} for individuals (F_MISS will give proportion of missing SNPs per individual) 
+- {output.lmiss} for snps (F_MISS will give proportion of samples missing per SNP)
+- stricter missingness should apply for low MAF snps
+- evaluate SNP missingness rates per cohort, genotyping batch, case-control status
+
+```{bash}
+plink \
+--bfile ../1.split_cohorts/cohort_split_ichip1t6 \
+--missing \
+--out temp_all_cohort_split_ichip1t6 
+```
+
+Total genotyping rate is 0.998891. The batches have aready been filtered for SNPs in common that passed QC at each run. 
+
+```{r message=FALSE, warning=FALSE}
+lmiss <- read_table("temp_all_cohort_split_ichip1t6.lmiss")
+lmiss %>%
+  ggplot(aes(x = F_MISS)) +
+  geom_density() +
+  labs(title = "SNP Level Missingess")
+```
+
+Low missingness across iChip1-6
+
+```{r message=FALSE, warning=FALSE}
+imiss <- read_table("temp_all_cohort_split_ichip1t6.imiss")
+imiss %>%
+  ggplot(aes(x = F_MISS)) +
+  geom_histogram(bins = 100) +
+  labs(title = "Sample Level Missingess")
+```
+
+Small amount of missingness, likely batch related due to unique peaks, but still quite low. 
+
+```{r}
+imiss %>%
+  filter(F_MISS >= 0.03) 
+```
+No samples with > 3% missingness. 
+
+### Samples with outlying heterozygosity rates
+- To calculate individual inbreeding F / heterozygosity With whole genome data, can be applied to pruned subset plink output includes:
+  - O(HOM)    Observed number of homozygotes
+  - E(HOM)    Expected number of homozygotes
+  - N(NM)     Number of non-missing genotypes
+  - F         F inbreeding coefficient estimate
+- approx norm range: -0.2 to 0.2, mode around zero 
+- Low heterozygosity (high F; positive value) may indicate inbreeding; 
+- high heterozygosity (low F; negative value) may indicate contamination. 
+
+```{bash}
+plink \
+--bfile ../1.split_cohorts/cohort_split_ichip1t6 \
+--het \
+--out temp_all_cohort_split_ichip1t6
+```
+
+```{r message=FALSE, warning=FALSE}
+het <- read_table("temp_all_cohort_split_ichip1t6.het") 
+het <- het %>%
+  mutate(obs_het_rate = (`N(NM)` - `O(HOM)`)/`E(HOM)`)
+imiss_het <- left_join(imiss, het, by = "FID")
+
+ggplot(imiss_het, aes(x = F_MISS, y = obs_het_rate)) +
+  geom_point(color = densCols(log10(imiss_het$F_MISS), imiss_het$obs_het_rate)) +
+  labs(x = "Proportion of missing genotypes", y = "Heterozygosity rate") +
+  scale_x_log10(limits = c(0.001, 1), minor_breaks = c(0.01, 0.1)) +
+  scale_y_continuous(limits = c(0, .5)) +
+  geom_vline(xintercept = 0.03, color = "red") +
+  geom_hline(yintercept = (mean(imiss_het$obs_het_rate)+(3*sd(imiss_het$obs_het_rate))), color = "red") +
+  geom_hline(yintercept = (mean(imiss_het$obs_het_rate)-(3*sd(imiss_het$obs_het_rate))), color = "red")
+```
+
+### Identify het outliers
+
+```{r}
+imiss_het %>%
+  filter(obs_het_rate >= (mean(imiss_het$obs_het_rate)+(4*sd(imiss_het$obs_het_rate))) |
+           obs_het_rate <= (mean(imiss_het$obs_het_rate)-(4*sd(imiss_het$obs_het_rate)))) %>%
+  kable(caption = "Samples That Fail Het Check")
+
+imiss_het %>%
+  filter(obs_het_rate >= (mean(imiss_het$obs_het_rate)+(4*sd(imiss_het$obs_het_rate))) |
+           obs_het_rate <= (mean(imiss_het$obs_het_rate)-(4*sd(imiss_het$obs_het_rate)))) %>%
+  dplyr::select(FID, IID.x) %>%
+  write_tsv("fail-het-outlier.txt", col_names = FALSE)
+```
+75 samples failed het check. They are overalll pretty good. Using 4 SD due to large sample. 
+
+
+## Calculate Overall project MAF before Filtering
+
+```{bash}
+plink \
+--bfile ../1.split_cohorts/cohort_split_ichip1t6 \
+--freq \
+--out temp_all_cohort_split_ichip1t6
+```
+
+```{r message=FALSE, warning=FALSE}
+maffreq <- read_table2("temp_all_cohort_split_ichip1t6.frq")
+maffreq %>%
+  ggplot(aes(x = MAF)) +
+  geom_histogram(aes(y =..density..)) +
+  geom_density(col=2) +
+  labs(title = "Overall MAF Prior to Filtering")
+```
+
+## Identification of Duplicated or Related Individuals
+- Prune dataset for temporary use of calculating cryptic relatedness and PCA as both work best under assumption of no LD among SNPs  
+- Prior to calcuating identity by state, IBS, prune SNPs to only independent SNPs and remove regions with extended linkage disequiblibirum such as HLA region. The below removes snps within a 50kb window, with an r2 > .2 and variant count to shift the window at the end of each step of 5kb.   
+
+```{bash}
+plink \
+--bfile ../1.split_cohorts/cohort_split_ichip1t6 \
+--exclude range ../../original_data/highLDregions.txt \
+--indep 50 5 1.8 \
+--out temp_all_cohort_split_ichip1t6 &>/dev/null
+```
+
+Pruning complete. 12358 variants excluded removed in high ld.  77007 of 120892 variants removed  variants removed. I will keep only the prune.in snps for the subsequent analysis. 
+
+- Can add --min 0.12 to identify minimum pihat for genome output to manage size of output dataset (will only output pihat >0.12)
+- PIHAT 1.0 = monozygotic twins or known replicates 
+- PIHAT 0.5 = 1st degree relatives: P-C, sibs
+- PIHAT 0.25= 2nd degree relatives: half-sib, grandparents
+- PIHAT 0.125= 3rd degree relatives: full cousins
+
+```{bash}
+plink \
+--bfile ../1.split_cohorts/cohort_split_ichip1t6 \
+--extract temp_all_cohort_split_ichip1t6.prune.in \
+--genome \
+--min 0.12 \
+--out temp_all_cohort_split_ichip1t6 &>/dev/null
+```
+
+```{r warning=FALSE, message=FALSE}
+genome <- read_table2("temp_all_cohort_split_ichip1t6.genome")
+
+genome <- genome %>%
+  mutate(PI_HAT = as.double(PI_HAT)) %>%
+  mutate(color = if_else(PI_HAT <.15, "~3rd degree",
+                         if_else(PI_HAT >=.15 & PI_HAT <.35, "~2nd degree",
+                                 if_else(PI_HAT >= .35 & PI_HAT < .65, "~1st degree",
+                                         if_else(PI_HAT > .65, "~Replicates or twins", "???")))))
+
+genome %>%
+  ggplot(aes(x = as.double(Z0), y = as.double(Z1), color = color)) +
+  geom_point(alpha = 1/20) +
+  guides(colour = guide_legend(override.aes = list(alpha = 1)))+
+  labs(x = "Z0 the proportion of loci where the pair shares zero alleles", 
+       y = "Z1 the proportion of loci where the pair shares one allele") 
+
+```
+
+We have a related cohort. The above plot is restricted to samples with a PI_HAT atleast 0.12. Samples can be represented more than once if multiple relations are found. 
+
+```{r warning=FALSE, message=FALSE}
+genome %>%
+  ggplot(aes(x = as.double(PI_HAT), fill = color)) +
+  geom_histogram(bins = 100) +
+  labs(title = "Distribution of PI_HAT for Related Individuals >0.12", x = "PI_HAT", y = "Count (non-unique)")
+
+```
+
+```{r}
+genome %>%
+  filter(PI_HAT > 0.8)
+
+genome %>%
+  filter(PI_HAT > 0.8) %>%
+  write_tsv("possible_duplicates.tsv")
+```
+Since I am only interested in removing duplicates, will set a PI-HAT threshold of 0.8. IN alter analysis, we might want to restrict to non-relateds. 
+
+# Part 2 Apply QC Filters and Fix Errors
+## Clean Sexes and remove samples and SNPs that fail heterozygoisty, genotyping, sex-checks and IBD >= 0.8/ 
+### Clean Sexs
+#### First update sex for subjects with PEDSEX == 0 and approriate F stat
+If PED sex 0 and F < 0.4 updated PED to Female 2 (not needed in this set)
+If PED sex 0 and F > 0.8 update PED to male 1 
+All samples with previously un-assigned PED SEX assigned
+
+```{r}
+sexcheck %>%
+  filter(PEDSEX == 0) %>%
+  mutate(PEDSEX = ifelse(F < 0.4, 2,
+                          ifelse(F > 0.8, 1, PEDSEX))) %>% 
+  filter(PEDSEX != 0) %>%
+  dplyr::select(FID, IID, PEDSEX)  %>%
+  write_tsv("update-missing-sex.txt", col_names = FALSE)
+  
+sexcheck %>%
+  filter(PEDSEX == 0) %>%
+  mutate(PEDSEX = ifelse(F < 0.4, 2,
+                          ifelse(F > 0.8, 1, PEDSEX))) %>% 
+  filter(PEDSEX != 0) %>%
+  dplyr::select(FID, IID, PEDSEX) %>%
+  kable(caption = "Subjects to Update Sex")
+
+```
+5 subjects to update PED sex
+
+#### Create List of Subjects that Fail Sex Check After Update
+```{r}
+sexcheck %>%
+  filter(PEDSEX == 1 & SNPSEX == 2 |
+           PEDSEX == 2 & SNPSEX == 1 |
+           PEDSEX == 2 & SNPSEX == 0 & F > 0.4 |
+           PEDSEX == 1 & SNPSEX == 0 & F < 0.8) %>%
+  kable(caption = "Subjects that Fail Sex Check")
+
+sexcheck %>%
+  filter(PEDSEX == 1 & SNPSEX == 2 |
+           PEDSEX == 2 & SNPSEX == 1 |
+           PEDSEX == 2 & SNPSEX == 0 & F > 0.4 |
+           PEDSEX == 1 & SNPSEX == 0 & F < 0.8) %>%
+  dplyr::select(FID, IID) %>%
+  write_tsv(path = "fail-updated-sex-check.txt", col_names = FALSE)
+```
+These are 13 female samples, that have out of range but quasi-reasonable F. I will remove. Disucssed with Talin.
+
+#### Update Sex in PLINK
+```{bash}
+plink \
+--bfile ../1.split_cohorts/cohort_split_ichip1t6 \
+--update-sex update-missing-sex.txt \
+--remove fail-updated-sex-check.txt \
+--make-bed \
+--out temp1_all_cohort_split_ichip1t6
+```
+--update-sex: 5 people updated.
+--Removed 13 samples. Went from  9971 to 9958 subjects. All F
+
+### Exclude Samples with IBD > 0.8
+For the purposes of this QC, I want to identify all pairs of individuals with an IBD >=0.8 and then remove the individual in the pair with the lower genotyping rate. IN some cases, you will want to remove the individual with the lower genotyping rate dependent on the phenotype. The ID of the individuals with the lower genotype rate will be stored in ‘fail-IBD-QC.txt’ for subsequent removal.
+
+```{r}
+relateds <- genome %>%
+  filter(PI_HAT > 0.8)
+
+compare_missingness <- function(FID1, IID1, FID2, IID2, imiss){
+  output <- data.frame(fid1_miss = numeric(length(FID1)),
+                       fid2_miss = numeric(length(FID1)))
+  for(i in seq_along(FID1)) {
+    fid1_miss <- imiss %>%
+      filter(FID == FID1[[i]] & IID == IID1[[i]]) %>%
+      select(F_MISS) %>%
+      unlist() 
+    
+    fid2_miss <- imiss %>%
+      filter(FID == FID2[[i]] & IID == IID2[[i]]) %>%
+      select(F_MISS) %>%
+      unlist()
+    
+    output[i,] <- c(fid1_miss, fid2_miss)
+  }
+  return(output)
+}
+
+output <- compare_missingness(relateds$FID1, relateds$IID1, relateds$FID2, relateds$IID2, imiss)
+
+relateds <- relateds %>%
+  bind_cols(., output) %>%
+  mutate(better_sample = if_else(fid1_miss <= fid2_miss, paste("FID1"), paste("FID2")))
+
+duplicates_to_remove <- relateds %>%
+  mutate(remove_fid = if_else(better_sample == "FID1", FID2,
+                              if_else(better_sample == "FID2", FID1, "Wilson"))) %>%
+  mutate(remove_iid = ifelse(better_sample == "FID1", IID2,
+                              ifelse(better_sample == "FID2", IID1, "Wilson"))) %>%
+  select(remove_fid, remove_iid) %>%
+  write_tsv("fail-IBD-QC.tsv", col_names = FALSE)
+  
+```
+
+```{bash}
+plink \
+--bfile temp1_all_cohort_split_ichip1t6 \
+--remove fail-IBD-QC.tsv \
+--make-bed \
+--out temp2_all_cohort_split_ichip1t6
+```
+9958 people to 9804 people. 154 duplicates removed. 
+
+### Failed SNPs missingness >97% and MAF 1%, and HWE 10^-6
+
+```{bash}
+plink \
+--bfile temp2_all_cohort_split_ichip1t6 \
+--geno 0.03 \
+--maf 0.01 \
+--hwe 0.000001 \
+--make-bed \
+--out temp3_all_cohort_split_ichip1t6 
+```
+514 variants removed due to missing genotype data (--geno).
+10135 variants removed due to Hardy-Weinberg exact test (--hwe)
+15144 variants removed due to minor allele threshold(s)(--maf)
+
+I am not applying a sample level genotype filter at this stage, becuase there may be some batch differences that I frist want to resolve at the SNP level rather than at the sample level. See below
+
+### Failed Sample missingness >97%
+```{bash}
+plink \
+--bfile temp3_all_cohort_split_ichip1t6 \
+--mind 0.03 \
+--make-bed \
+--out temp4_all_cohort_split_ichip1t6 
+```
+No samples are removed at this stage and overall genotyping rate is quite good. Continuing on with this sub-set of SNPs. 
+
+### Remove samples that fail het check
+```{bash}
+plink \
+--bfile temp4_all_cohort_split_ichip1t6 \
+--remove fail-het-outlier.txt \
+--make-bed \
+--out qc_all_cohort_split_ichip1t6
+```
+9804 people to 9733 people. 71 samples out of 75 identified (3 previosuly removed). 
+
+
+# Part 3 Re-Check File Post QC
+## Recheck Missingess and Sex with Cleaned File
+
+```{bash}
+plink \
+--bfile qc_all_cohort_split_ichip1t6 \
+--missing \
+--out qc_all_cohort_split_ichip1t6
+```
+
+```{r message=FALSE, warning=FALSE}
+lmiss <- read_table("qc_all_cohort_split_ichip1t6.lmiss")
+lmiss %>%
+  ggplot(aes(x = F_MISS)) +
+  geom_histogram(bins = 10) +
+  labs(title = "SNP Level Missingess after SNP level Filtering")
+```
+
+```{r message=FALSE, warning=FALSE}
+imiss <- read_table("qc_all_cohort_split_ichip1t6.imiss")
+imiss %>%
+  ggplot(aes(x = F_MISS)) +
+  geom_histogram(bins = 100) +
+  labs(title = "Sample Level Missingess after Sample Level Filtering")
+```
+Batch effect resolved. 
+
+## Re-Check Hets
+```{bash}
+plink \
+--bfile qc_all_cohort_split_ichip1t6 \
+--het \
+--out qc_all_cohort_split_ichip1t6
+```
+
+```{r message=FALSE, warning=FALSE}
+imiss <- read_table("qc_all_cohort_split_ichip1t6.imiss")
+het <- read_table("qc_all_cohort_split_ichip1t6.het") %>%
+  mutate(obs_het_rate = (`N(NM)` - `O(HOM)`)/`E(HOM)`)
+imiss_het <- left_join(imiss, het, by = "FID")
+
+ggplot(imiss_het, aes(x = F_MISS, y = obs_het_rate)) +
+  geom_point(color = densCols(log10(imiss_het$F_MISS), imiss_het$obs_het_rate)) +
+  labs(x = "Proportion of missing genotypes", y = "Heterozygosity rate") +
+  scale_x_log10(limits = c(0.001, 1), minor_breaks = c(0.01, 0.1)) +
+  scale_y_continuous(limits = c(0, .5)) +
+  geom_vline(xintercept = 0.03, color = "red") +
+  geom_hline(yintercept = (mean(imiss_het$obs_het_rate)+(3*sd(imiss_het$obs_het_rate))), color = "red") +
+  geom_hline(yintercept = (mean(imiss_het$obs_het_rate)-(3*sd(imiss_het$obs_het_rate))), color = "red")
+```
+Looks great. 
+
+## Calculate Overall project MAF Adter Filtering
+
+```{bash}
+plink \
+--bfile qc_all_cohort_split_ichip1t6 \
+--freq \
+--out qc_all_cohort_split_ichip1t6
+```
+
+```{r message=FALSE, warning=FALSE}
+maffreq <- read_table2("qc_all_cohort_split_ichip1t6.frq")
+maffreq %>%
+  ggplot(aes(x = MAF)) +
+  geom_histogram(aes(y =..density..)) +
+  geom_density(col=2) +
+  labs(title = "Overall MAF After Filtering")
+```
+
+## Identification of Duplicated or Related Individuals
+- Prune dataset for temporary use of calculating cryptic relatedness and PCA as both work best under assumption of no LD among SNPs  
+- Prior to calcuating identity by state, IBS, prune SNPs to only independent SNPs and remove regions with extended linkage disequiblibirum such as HLA region. The below removes snps within a 50kb window, with an r2 > .2 and variant count to shift the window at the end of each step of 5kb.   
+
+```{bash}
+plink \
+--bfile qc_all_cohort_split_ichip1t6 \
+--exclude ../../original_data/highLDregions.txt \
+--range \
+--indep 50 5 1.8 \
+--out qc_all_cohort_split_ichip1t6 &>/dev/null
+```
+
+```{bash}
+plink \
+--bfile qc_all_cohort_split_ichip1t6 \
+--extract qc_all_cohort_split_ichip1t6.prune.in \
+--genome \
+--min 0.12 \
+--out qc_all_cohort_split_ichip1t6 &>/dev/null
+```
+
+```{r warning=FALSE, message=FALSE}
+genome <- read_table2("qc_all_cohort_split_ichip1t6.genome")
+
+genome <- genome %>%
+  mutate(PI_HAT = as.double(PI_HAT)) %>%
+  mutate(color = if_else(PI_HAT <.15, "~3rd degree",
+                         if_else(PI_HAT >=.15 & PI_HAT <.35, "~2nd degree",
+                                 if_else(PI_HAT >= .35 & PI_HAT < .65, "~1st degree",
+                                         if_else(PI_HAT > .65, "~Replicates or twins", "???")))))
+
+genome %>%
+  ggplot(aes(x = as.double(Z0), y = as.double(Z1), color = color)) +
+  geom_point(alpha = 1/20) +
+  guides(colour = guide_legend(override.aes = list(alpha = 1)))+
+  labs(x = "Z0 the proportion of loci where the pair shares zero alleles", 
+       y = "Z1 the proportion of loci where the pair shares one allele") 
+
+```
+
+Replicates (purple) removed
+
+```{r warning=FALSE, message=FALSE}
+genome %>%
+  ggplot(aes(x = as.double(PI_HAT), fill = color)) +
+  geom_histogram(bins = 100) +
+  labs(title = "Distribution of PI_HAT for Related Individuals >0.12", x = "PI_HAT", y = "Count (non-unique)")
+```
+
+```{r}
+file.remove(list.files(pattern = "^temp", full.names = TRUE))
+```
+
