@@ -1,0 +1,160 @@
+---
+title: "iChip 1 - 6 European Samples Prepare for Imputation Submission"
+author: "Translational Genomics Group"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(ggplot2)
+library(dplyr)
+```
+
+## Prepare VCF for Imputation Submission
+### Download HRC Reference 
+This file has already been downloaded to a shared directory. 
+```{bash eval = FALSE}
+wget -p /mnt/share6/SHARED_DATASETS/Haplotype_Reference_Consortium ftp://ngs.sanger.ac.uk/production/hrc/HRC.r1-1/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz &>/dev/null
+```
+
+```{bash eval = FALSE}
+gunzip -k /mnt/share6/SHARED_DATASETS/Haplotype_Reference_Consortium/HRC.r1-1.GRCh37.wgs.mac5.sites.tab.gz &>/dev/null
+```
+
+### Download HRC Check Tool 
+```{bash eval = FALSE}
+wget http://www.well.ox.ac.uk/~wrayner/tools/HRC-1000G-check-bim-v4.2.9.zip -O temp.zip; unzip temp.zip; rm temp.zip
+```
+
+### Download Will Rayner Strand FIle to Align to Reference
+Download Immuno_BeadChip_11419691_B Strand Files for iChip 1 to 6 and Ref/Alt File
+```{bash eval = FALSE, message = FALSE}
+wget http://www.well.ox.ac.uk/~wrayner/strand/Immuno_BeadChip_11419691_B-b37-strand.zip -O temp.zip; unzip temp.zip; rm temp.zip &>/dev/null
+
+wget http://www.well.ox.ac.uk/~wrayner/strand/RefAlt/Immuno_BeadChip_11419691_B-b37.strand.RefAlt.zip -O temp.zip; unzip temp.zip; rm temp.zip &>/dev/null
+```
+
+### B. Create List of SNPs to Flip
+```{r}
+strand <- read_tsv("immuno_beadchip_11419691_b-b37.strand", 
+                   col_names = c("SNP", "Chr", "BP", "Match", "Strand", "Allele"))
+
+strand %>%
+  filter(Strand == "-") %>%
+  select(SNP) %>%
+  write_tsv("temp_flip_ichip1t6.tsv", col_names = FALSE)
+```
+
+### C. Flip SNPs to Convert TOP to Forward/Ref in Plink
+```{bash}
+plink \
+--bfile ../3.qc/qc_eur_cohort_split_ichip1t6 \
+--flip temp_flip_ichip1t6.tsv \
+--make-bed \
+--out temp_ichip1t6
+```
+
+### D. Set Ref/Alt Allele 
+```{bash}
+plink \
+--bfile temp_ichip1t6 \
+--reference-allele Immuno_BeadChip_11419691_B-b37.strand.RefAlt 2 \
+--chr 1-22 \
+--make-bed \
+--out temp1_ichip1t6
+```
+
+### E. Calcualte Allele Frequency
+```{bash}
+plink \
+--bfile temp1_ichip1t6 \
+--keep-allele-order \
+--freq \
+--out temp1_ichip1t6
+```
+
+### F. Final Checks
+```{bash eval = FALSE}
+perl HRC-1000G-check-bim.pl \
+-b temp1_ichip1t6.bim \
+-f temp1_ichip1t6.frq \
+-r /mnt/share6/SHARED_DATASETS/Haplotype_Reference_Consortium/HRC.r1-1.GRCh37.wgs.mac5.sites.tab \
+-h
+```
+
+- 4 markers, match by name to HRC but have a different position (same CHR), will exclude. rs1377587 rs1319548 rs9258651	rs2085508
+- 66 markers are on the wrong strand when compared to HRC reference after strand flips from Will's files. Will re-flip possible difference references used. 
+- 854 with wrong ref assignemnt
+
+### Remove 4 SNPs with different positions
+```{bash}
+plink \
+--bfile temp1_ichip1t6 \
+--exclude Position-temp1_ichip1t6-HRC.txt \
+--make-bed \
+--out temp2_ichip1t6
+```
+
+### Exclude SNPS
+```{bash}
+plink \
+--bfile temp2_ichip1t6 \
+--exclude Exclude-temp1_ichip1t6-HRC.txt \
+--make-bed \
+--out temp3_ichip1t6
+```
+
+### Flip 
+```{bash}
+plink \
+--bfile temp3_ichip1t6 \
+--flip Strand-Flip-temp1_ichip1t6-HRC.txt \
+--make-bed \
+--out temp4_ichip1t6
+```
+
+### Set Ref/Alt
+```{bash}
+plink \
+--bfile temp4_ichip1t6 \
+--reference-allele Force-Allele1-temp1_ichip1t6-HRC.txt \
+--make-bed \
+--out ichip1t6_eur_qc_pre_impute
+```
+
+```{r}
+freq_plot <- read_tsv("FreqPlot-temp1_ichip1t6-HRC.txt", col_names = FALSE)
+
+freq_plot %>%
+  ggplot(aes(x = X2, y = X3)) +
+  geom_point(alpha = 1/500)
+
+```
+
+## Convert to VCF using Plink
+Using Plink1.9 becuase plink2 outputs VCFv4.3 which is not yet supported by the server.
+Plink1.9 on vcf recode defualts to A2 allele as reference, so forcing a2 allele to curent a1. 
+
+```{bash eval = FALSE}
+for i in {1..22}; do
+    plink --bfile ichip1t6_eur_qc_pre_impute \
+    --chr ${i} \
+    --real-ref-alleles \
+    --recode vcf \
+    --out ichip1t6_eur_vcfs/ichip1t6_eur_chr${i}
+done
+```
+
+## Create Sorted and Compressed VCF using VCFtools and tabix (including bgzip)
+```{bash eval = FALSE}
+for i in {1..22}; do
+    vcf-sort ichip1t6_eur_vcfs/ichip1t6_eur_chr${i}.vcf | bgzip -c > ichip1t6_eur_vcfs/ichip1t6_eur_chr${i}.vcf.gz
+done
+```
+
+```{r}
+file.remove(list.files(pattern = "^temp", full.names = TRUE))
+```
+Submit to Michigan Imputation Server. 

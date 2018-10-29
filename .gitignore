@@ -30,3 +30,6 @@ workflow/2.estimate_ancestry/ichip7_1000G_markers/
 *.het
 *.prune.in
 *.prune.out
+*.vcf
+*.vcf.gz
+
