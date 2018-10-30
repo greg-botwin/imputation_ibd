@@ -2,7 +2,7 @@
 title: "iChip 1 - 6 European Samples Prepare for Imputation Submission"
 author: "Translational Genomics Group"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -37,7 +37,7 @@ wget http://www.well.ox.ac.uk/~wrayner/strand/RefAlt/Immuno_BeadChip_11419691_B-
 ```
 
 ### B. Create List of SNPs to Flip
-```{r}
+```{r message=FALSE}
 strand <- read_tsv("immuno_beadchip_11419691_b-b37.strand", 
                    col_names = c("SNP", "Chr", "BP", "Match", "Strand", "Allele"))
 
