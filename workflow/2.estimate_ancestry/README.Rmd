@@ -1,0 +1,22 @@
+---
+title: "Estimate Ancestry and Split Cohorts Based on Ancestry - README"
+author: "Estimate Ancestry and Split Cohorts Based on Ancestry"
+date: "2/22/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Tasks
+1. Preapre iChip 1 to 6 Dataset to match 1000 Genome Reference
+    + Will Rayner strand files were used to flip approriate alleles and assign ref/alt status
+    + EUR, EAS, AFR phase 1000 Genomes Phase 3 Files were downloaded as reference
+    + Ancestry calc ponly performed on high quality SNPs filtered for --geno 0.03, --maf 0.01, --hwe 0.000001, --chr 1-22 
+2. 1000 Genome Data was processed to match iChip Data
+    + Genome data was filtere to SNPs in common with iChip
+    + 1000 Genome data were merged with ichip data
+    + Merged dataset was pruned --indep 50 5 1.8, --geno .03, --maf .01
+3. Supervised admixture was performed on the merged and pruned dataset
+    + samples with >75 EUR ancestry were flagged and each cohort was subsequently split by ancestry
