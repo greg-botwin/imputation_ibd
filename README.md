@@ -32,7 +32,7 @@ All samples were gentoyped using the Illumina ImmunoChip platform and markers we
 Supplementary
 -------------
 
-Source code and additioanl files avaialble at <https://github.com/greg-botwin/imputation_ibd>
+Source code and additional files available at <https://github.com/greg-botwin/imputation_ibd>
 
 Data
 ----
