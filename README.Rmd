@@ -27,3 +27,12 @@ Each workflow step has its own folder and README. Often each workflow step is re
 
 ## Summary
 All samples were gentoyped using the Illumina ImmunoChip platform and markers were assigned hg19 coordinates based on the manufacturers alignment files. Markers mapping to insertions and deletions, non-automosomal chromosomes, or markers that were were unable to be mapped to an hg19 coordinate were removed. Samples were split into three cohorts based on the version of the platform they were gentoyped on (ichip1-6, ichip7, bbc). For each cohort, ancestry estimation was performed using the ADMIXTURE tool. Allele frequencies learned in a supervised manner from labeled data provided by 1000 Genomes samples belonging to the EUR, AFR and EAS populations. Then ancestry proportions were estimated and samples with > 75% estimated european ancestry were split into a european cohort. A standardized QC was performed for each of the 5 ancestry defined cohorts and then vcf files per chromosome were uploaded to the Michigan Imputation Server. The hrc.r1.1.2016 reference panel was used for european ancestry samples, phasing was performed by Eagle and imputation was performed by Minimac. Post imputation markers were filtered for R2 > 0.3 and stored per chromosome and all chromosomes combined. 
+
+## Supplementary
+Source code and additioanl files avaialble at https://github.com/greg-botwin/imputation_ibd 
+
+## Data 
+The data is stored in:
+
+`/mnt/YanX/imputation_results/ichip1t6_eur/extracted_vcfs/filtered`
+`/mnt/YanX/imputation_results/ichip7_eur/extracted_vcfs/filtered`
