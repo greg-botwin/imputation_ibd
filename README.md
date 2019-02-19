@@ -20,7 +20,7 @@ Workflow
 
 1.  Split genetic data into relevant cohorts [split\_cohorts](workflow/1.split_cohorts/)
 2.  Estimate ancestry and split cohorts based on ancestry [estimate\_ancestry](workflow/2.estimate_ancestry/)
-3.  Perform ancestry specific QC [qc](wokflow/3.qc/)
+3.  Perform ancestry specific QC [qc](workflow/3.qc/)
 4.  Prepare genotype data for Imputation QC [pre\_impute\_prep](workflow/4.pre_impute_prep/)
 5.  Post imputation QC [post\_impute\_qc](workflow/5.post_impute_qc/)
 

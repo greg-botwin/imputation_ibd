@@ -21,7 +21,7 @@ Each workflow step has its own folder and README. Often each workflow step is re
 
 1. Split genetic data into relevant cohorts [split_cohorts](workflow/1.split_cohorts/)
 2. Estimate ancestry and split cohorts based on ancestry [estimate_ancestry](workflow/2.estimate_ancestry/)
-3. Perform ancestry specific QC [qc](wokflow/3.qc/)
+3. Perform ancestry specific QC [qc](workflow/3.qc/)
 4. Prepare genotype data for Imputation QC [pre_impute_prep](workflow/4.pre_impute_prep/)
 5. Post imputation QC [post_impute_qc](workflow/5.post_impute_qc/)
 
