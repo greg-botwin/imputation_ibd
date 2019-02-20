@@ -1,5 +1,5 @@
 ---
-title: "iChip 1 - 6 European Samples Prepare for Imputation Submission"
+title: "iChip 7 European Samples Prepare for Imputation Submission"
 author: "Translational Genomics Group"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: github_document
@@ -16,9 +16,9 @@ library(tidyr)
 library(knitr)
 ```
 
-```{r include=FALSE}
+```{r}
 # clean data
-files <- list.files("/mnt/YanX/imputation_results/ichip1t6_eur/info_files", full.names = TRUE)
+files <- list.files("/mnt/YanX/imputation_results/ichip7_eur/info_files", full.names = TRUE)
 
 col_types <- cols(
   SNP = col_character(),
@@ -69,11 +69,6 @@ df %>%
   group_by(Genotyped) %>%
   summarise(n = n()) %>%
   kable(caption = "Total Number of SNPs Genotyped and Imputed")
-
-df %>%
-  filter(Genotyped == "Imputed") %>%
-  filter(Rsq > 0.3) %>%
-  nrow()
 ```
 
 ```{r}
@@ -87,7 +82,6 @@ df %>%
   geom_text(aes(label = n), vjust = -0.5) +
   labs(x = "Rsq Bins", y = "Number of Markers", title = "Total Number of Imputed Markers per Rsq Bin")
 ```
-
 ### QC On All Chromosomes
 ```{r}
 df_x <- df
@@ -183,7 +177,8 @@ df_x %>%
   
 ```
 
-```{r}
+
+```{r include=FALSE, eval=FALSE}
 post_impute_qc <- function(df, chr){
   df_x <- df %>%
     filter(Chr == chr)
@@ -283,16 +278,6 @@ post_impute_qc <- function(df, chr){
   return(images)
 }
   
-```
-
-```{r, eval=FALSE}
-chrs <- c(1:22)
-x2 <- list()
-
-for(i in chrs) {
-  x <- post_impute_qc(df, i)
-  x2 <- list(x2, x)
-}
 ```
 
 Entries with MAF == NA, were not seen in our dataset. 
